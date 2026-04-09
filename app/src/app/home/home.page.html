@@ -1,102 +1,66 @@
-<ion-header class="home-header" [translucent]="true">
+<ion-header class="app-header">
   <ion-toolbar>
-    <ion-title>FinTrack Design System</ion-title>
+    <ion-title>FinTrack</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="home-page">
-    <section class="hero">
-      <p class="ft-caption hero__eyebrow">Offline-first personal finance</p>
-      <h1 class="ft-title-xl">Sistema visual listo para escalar en mobile</h1>
-      <p class="ft-body-lg hero__copy">
-        Componentes consistentes, feedback claro y semantica visual pensada para ingresos, gastos y presupuestos.
-      </p>
+<ion-content fullscreen="true" class="home-content">
+  <!-- Balance Card -->
+  <ion-card class="balance-card">
+    <ion-card-content>
+      <p class="balance-label">Balance del mes</p>
+      <h1 class="balance-amount">€0.00</h1>
 
-      <div class="hero__actions">
-        <ft-button (buttonClick)="markSynced()">Guardar cambios</ft-button>
-        <ft-button variant="secondary">Ver reportes</ft-button>
-        <ft-button variant="ghost">Exportar</ft-button>
-      </div>
-    </section>
-
-    <ft-balance-card [income]="4200" [expense]="2575.4"></ft-balance-card>
-
-    <section class="ft-stack-lg">
-      <div class="section-heading">
-        <h2 class="ft-title-lg">Inputs y estados</h2>
-        <p class="ft-body">Tokens y componentes preparados para pantallas de alta frecuencia de uso.</p>
-      </div>
-
-      <ft-card>
-        <div class="ft-stack-md">
-          <ft-amount-input
-            label="Nuevo gasto"
-            helperText="Usa coma o punto decimal"
-            placeholder="0.00"
-            [value]="amount()"
-            (valueChange)="setAmount($event)"
-          />
-
-          <div class="ft-stack-sm">
-            <span class="ft-caption">Monto detectado</span>
-            <strong class="ft-title-md">{{ amount() ?? 0 | currency:'EUR':'symbol':'1.2-2' }}</strong>
-          </div>
+      <div class="balance-details">
+        <div class="income">
+          <span class="label">Ingresos</span>
+          <span class="amount">€0.00</span>
         </div>
-      </ft-card>
-    </section>
 
-    <section class="ft-stack-lg">
-      <div class="section-heading">
-        <h2 class="ft-title-lg">Presupuestos</h2>
-        <p class="ft-body">La barra usa estados semanticos para alertar antes y despues del limite.</p>
-      </div>
-
-      <ft-card>
-        <div class="ft-stack-lg">
-          <ft-progress-bar label="Hogar" [value]="640" [limit]="900"></ft-progress-bar>
-          <ft-progress-bar label="Comida" [value]="860" [limit]="900"></ft-progress-bar>
-          <ft-progress-bar label="Transporte" [value]="1030" [limit]="900"></ft-progress-bar>
+        <div class="expense">
+          <span class="label">Gastos</span>
+          <span class="amount">€0.00</span>
         </div>
-      </ft-card>
-    </section>
-
-    <section class="ft-stack-lg">
-      <div class="section-heading">
-        <h2 class="ft-title-lg">Estados UX</h2>
-        <p class="ft-body">Loading, empty, toasts y sync status alineados con el sistema de tokens.</p>
       </div>
+    </ion-card-content>
+  </ion-card>
 
-      <div class="demo-grid">
-        <ft-card>
-          <div class="ft-empty-state">
-            <div class="ft-empty-state__icon">+</div>
-            <h3 class="ft-title-md">Todavia no hay movimientos</h3>
-            <p class="ft-body">Empieza registrando tu primer ingreso o gasto para ver metricas utiles.</p>
-          </div>
-        </ft-card>
+  <!-- Chart Placeholder -->
+  <ion-card class="chart-card">
+    <ion-card-header>
+      <ion-card-title>Resumen</ion-card-title>
+    </ion-card-header>
 
-        <ft-card>
-          <div class="ft-stack-md">
-            <div class="ft-skeleton ft-skeleton--title"></div>
-            <div class="ft-skeleton ft-skeleton--line"></div>
-            <div class="ft-skeleton ft-skeleton--line short"></div>
-          </div>
-        </ft-card>
+    <ion-card-content>
+      <div class="chart-placeholder">
+        <ion-icon name="pie-chart-outline"></ion-icon>
+        <p>No hay datos suficientes</p>
       </div>
+    </ion-card-content>
+  </ion-card>
 
-      <div class="ft-stack-sm">
-        <div class="ft-toast ft-toast--success">Ingreso guardado correctamente</div>
-        <div class="ft-toast ft-toast--error">No se pudo sincronizar el ultimo gasto</div>
-      </div>
+  <!-- Transactions -->
+  <div class="transactions-section">
+    <div class="section-header">
+      <h2>Últimas transacciones</h2>
+    </div>
 
-      <div class="sync-row">
-        <span class="ft-sync-status ft-sync-status--pending">Pendiente</span>
-        <span class="ft-sync-status" [class.ft-sync-status--synced]="syncStatus() === 'synced'" [class.ft-sync-status--pending]="syncStatus() !== 'synced'">
-          {{ syncStatus() === 'synced' ? 'Sincronizado' : 'Sincronizando' }}
-        </span>
-        <span class="ft-sync-status ft-sync-status--error">Error</span>
-      </div>
-    </section>
+    <div class="empty-state">
+      <ion-icon name="wallet-outline"></ion-icon>
+      <h3>Aún no tienes transacciones</h3>
+      <p>Agrega tu primera transacción para comenzar</p>
+    </div>
   </div>
+
+  <!-- FAB -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button class="fab-add">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

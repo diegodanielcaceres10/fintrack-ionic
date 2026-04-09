@@ -1,72 +1,165 @@
-:host {
-  display: block;
+/* =========================
+   Layout
+========================= */
+
+.home-content {
+  padding: var(--ft-space-4);
+  background: var(--ft-color-background);
 }
 
-.home-header ion-toolbar {
-  --background: color-mix(in srgb, var(--ft-color-surface) 88%, transparent);
-  --border-color: transparent;
-  backdrop-filter: blur(16px);
+.app-header ion-toolbar {
+  --background: var(--ft-color-surface);
+  --color: var(--ft-color-text-primary);
+  border-bottom: 1px solid var(--ft-color-border);
 }
 
-.home-page {
-  padding: calc(56px + var(--ft-space-4)) var(--ft-space-4) var(--ft-space-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--ft-space-6);
-}
+/* =========================
+   Balance Card
+========================= */
 
-.hero {
-  padding: var(--ft-space-6);
-  border-radius: var(--ft-radius-xl);
-  background:
-    radial-gradient(circle at top right, rgba(99, 179, 237, 0.3), transparent 34%),
-    linear-gradient(140deg, var(--ft-color-primary) 0%, var(--ft-color-primary-light) 100%);
-  color: #ffffff;
+.balance-card {
+  border-radius: var(--ft-radius-lg);
   box-shadow: var(--ft-shadow-card);
-}
+  margin-bottom: var(--ft-space-4);
 
-.hero__eyebrow,
-.hero__copy,
-.hero .ft-title-xl {
-  color: inherit;
-}
-
-.hero__copy {
-  margin-bottom: var(--ft-space-6);
-  max-width: 28rem;
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ft-space-3);
-}
-
-.section-heading {
-  display: grid;
-  gap: var(--ft-space-1);
-}
-
-.demo-grid {
-  display: grid;
-  gap: var(--ft-space-4);
-}
-
-.sync-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ft-space-3);
-}
-
-@media (min-width: 768px) {
-  .home-page {
-    max-width: 960px;
-    margin: 0 auto;
-    padding-left: var(--ft-space-6);
-    padding-right: var(--ft-space-6);
+  ion-card-content {
+    padding: var(--ft-space-4);
   }
 
-  .demo-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .balance-label {
+    font-size: var(--ft-font-size-sm);
+    color: var(--ft-color-text-secondary);
+    margin-bottom: var(--ft-space-1);
   }
+
+  .balance-amount {
+    font-size: var(--ft-font-size-2xl);
+    font-weight: 700;
+    line-height: var(--ft-line-height-tight);
+    color: var(--ft-color-text-primary);
+    margin-bottom: var(--ft-space-4);
+  }
+
+  .balance-details {
+    display: flex;
+    justify-content: space-between;
+
+    .income,
+    .expense {
+      display: flex;
+      flex-direction: column;
+
+      .label {
+        font-size: var(--ft-font-size-xs);
+        color: var(--ft-color-text-secondary);
+      }
+
+      .amount {
+        font-size: var(--ft-font-size-md);
+        font-weight: 600;
+      }
+    }
+
+    .income .amount {
+      color: var(--ft-color-success);
+    }
+
+    .expense .amount {
+      color: var(--ft-color-danger);
+    }
+  }
+}
+
+/* =========================
+   Chart Card
+========================= */
+
+.chart-card {
+  border-radius: var(--ft-radius-lg);
+  box-shadow: var(--ft-shadow-card);
+  margin-bottom: var(--ft-space-4);
+
+  ion-card-header {
+    padding-bottom: 0;
+  }
+
+  ion-card-title {
+    font-size: var(--ft-font-size-md);
+    font-weight: 600;
+  }
+
+  .chart-placeholder {
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ft-color-text-secondary);
+
+    ion-icon {
+      font-size: 40px;
+      margin-bottom: var(--ft-space-2);
+      opacity: 0.6;
+    }
+
+    p {
+      font-size: var(--ft-font-size-sm);
+    }
+  }
+}
+
+/* =========================
+   Transactions
+========================= */
+
+.transactions-section {
+  margin-top: var(--ft-space-2);
+
+  .section-header {
+    margin-bottom: var(--ft-space-3);
+
+    h2 {
+      font-size: var(--ft-font-size-md);
+      font-weight: 600;
+      color: var(--ft-color-text-primary);
+    }
+  }
+}
+
+/* =========================
+   Empty State
+========================= */
+
+.empty-state {
+  text-align: center;
+  padding: var(--ft-space-8) var(--ft-space-4);
+  color: var(--ft-color-text-secondary);
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: var(--ft-space-3);
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: var(--ft-font-size-md);
+    font-weight: 600;
+    color: var(--ft-color-text-primary);
+    margin-bottom: var(--ft-space-1);
+  }
+
+  p {
+    font-size: var(--ft-font-size-sm);
+    line-height: var(--ft-line-height-base);
+  }
+}
+
+/* =========================
+   FAB
+========================= */
+
+.fab-add {
+  --background: var(--ft-color-purple);
+  --border-radius: var(--ft-radius-pill);
+  box-shadow: var(--ft-shadow-card);
 }

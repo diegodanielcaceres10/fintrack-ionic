@@ -11,14 +11,14 @@
   --ft-color-danger-light: #f56565;
   --ft-color-danger-bg: #fed7d7;
 
-  --ft-color-background: #edf2f7;
+  --ft-color-background: #ffffff;
   --ft-color-surface: #ffffff;
   --ft-color-border: #e2e8f0;
   --ft-color-text-primary: #1a202c;
   --ft-color-text-secondary: #4a5568;
 
   --ion-background-color: var(--ft-color-background);
-  --ion-background-color-rgb: 237, 242, 247;
+  --ion-background-color-rgb: 255, 255, 255;
   --ion-text-color: var(--ft-color-text-primary);
   --ion-text-color-rgb: 26, 32, 44;
   --ion-color-primary: var(--ft-color-primary);
@@ -58,7 +58,7 @@
   --ion-color-danger-shade: #ad2a2a;
   --ion-color-danger-tint: #ce4545;
   --ion-color-light: var(--ft-color-background);
-  --ion-color-light-rgb: 237, 242, 247;
+  --ion-color-light-rgb: 255, 255, 255;
   --ion-color-light-contrast: var(--ft-color-text-primary);
   --ion-color-light-contrast-rgb: 26, 32, 44;
   --ion-color-light-shade: #d1d5da;
@@ -110,28 +110,12 @@
 
   --ion-font-family: var(--ft-font-family);
   --ion-border-color: var(--ft-color-border);
-  --ion-toolbar-background: color-mix(in srgb, var(--ft-color-surface) 84%, transparent);
+  --ion-toolbar-background: color-mix(
+    in srgb,
+    var(--ft-color-surface) 84%,
+    transparent
+  );
   --ion-toolbar-color: var(--ft-color-text-primary);
   --ion-item-background: var(--ft-color-surface);
   --ion-card-background: var(--ft-color-surface);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --ft-color-background: #1a202c;
-    --ft-color-surface: #243244;
-    --ft-color-border: #4a5568;
-    --ft-color-text-primary: #edf2f7;
-    --ft-color-text-secondary: #e2e8f0;
-    --ion-background-color: var(--ft-color-background);
-    --ion-background-color-rgb: 26, 32, 44;
-    --ion-text-color: var(--ft-color-text-primary);
-    --ion-text-color-rgb: 237, 242, 247;
-    --ion-toolbar-background: color-mix(in srgb, var(--ft-color-surface) 88%, transparent);
-    --ion-item-background: var(--ft-color-surface);
-    --ion-card-background: var(--ft-color-surface);
-    --ft-shadow-card: 0 12px 32px rgba(0, 0, 0, 0.22);
-    --ft-shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.3);
-  }
 }

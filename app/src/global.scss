@@ -63,7 +63,5 @@ body {
 }
 
 ion-content::part(background) {
-  background:
-    radial-gradient(circle at top right, rgba(99, 179, 237, 0.16), transparent 34%),
-    linear-gradient(180deg, var(--ft-color-background) 0%, #f7fafc 100%);
+  background: var(--ft-color-background);
 }
