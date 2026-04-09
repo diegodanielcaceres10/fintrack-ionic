@@ -1,165 +1,114 @@
-/* =========================
-   Layout
-========================= */
-
-.home-content {
-  padding: var(--ft-space-4);
-  background: var(--ft-color-background);
-}
-
-.app-header ion-toolbar {
-  --background: var(--ft-color-surface);
-  --color: var(--ft-color-text-primary);
-  border-bottom: 1px solid var(--ft-color-border);
-}
-
-/* =========================
-   Balance Card
-========================= */
-
+// Contenedor principal de la tarjeta de balance
 .balance-card {
+  background: var(--ft-color-primary); // Uso de tus variables
+  color: white;
   border-radius: var(--ft-radius-lg);
   box-shadow: var(--ft-shadow-card);
-  margin-bottom: var(--ft-space-4);
+  margin: 0;
+  padding: var(--ft-space-2);
 
-  ion-card-content {
-    padding: var(--ft-space-4);
-  }
-
-  .balance-label {
+  .label {
     font-size: var(--ft-font-size-sm);
-    color: var(--ft-color-text-secondary);
+    opacity: 0.8;
+    display: block;
     margin-bottom: var(--ft-space-1);
   }
 
-  .balance-amount {
+  .amount {
     font-size: var(--ft-font-size-2xl);
     font-weight: 700;
-    line-height: var(--ft-line-height-tight);
-    color: var(--ft-color-text-primary);
-    margin-bottom: var(--ft-space-4);
+    margin-bottom: var(--ft-space-6);
   }
 
-  .balance-details {
+  .stats-row {
     display: flex;
     justify-content: space-between;
+    gap: var(--ft-space-4);
+    background: rgba(255, 255, 255, 0.1);
+    padding: var(--ft-space-4);
+    border-radius: var(--ft-radius-md);
 
-    .income,
-    .expense {
+    .stat-item {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: var(--ft-space-2);
 
-      .label {
-        font-size: var(--ft-font-size-xs);
-        color: var(--ft-color-text-secondary);
+      ion-icon {
+        font-size: 24px;
       }
 
-      .amount {
-        font-size: var(--ft-font-size-md);
+      span {
+        font-size: var(--ft-font-size-xs);
+        display: block;
+      }
+
+      p {
+        margin: 0;
         font-weight: 600;
       }
-    }
 
-    .income .amount {
-      color: var(--ft-color-success);
+      &.income ion-icon {
+        color: var(--ft-color-success-light);
+      }
+      &.expense ion-icon {
+        color: var(--ft-color-danger-light);
+      }
     }
+  }
+}
 
-    .expense .amount {
+// Estilo de secciones
+.section-title {
+  font-size: var(--ft-font-size-lg);
+  font-weight: 600;
+  color: var(--ft-color-text-primary);
+  margin: var(--ft-space-6) 0 var(--ft-space-3);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Lista de transacciones (MVP 1 Polish)
+.transaction-item {
+  --background: var(--ft-color-surface);
+  --padding-start: var(--ft-space-4);
+  --inner-padding-end: var(--ft-space-4);
+  border-radius: var(--ft-radius-md);
+  margin-bottom: var(--ft-space-3);
+  border: 1px solid var(--ft-color-border);
+
+  .category-icon {
+    padding: var(--ft-space-2);
+    border-radius: var(--ft-radius-sm);
+    background: var(--ft-color-border);
+    color: var(--ft-color-primary);
+
+    &.food {
+      background: var(--ft-color-danger-bg);
       color: var(--ft-color-danger);
     }
+    &.work {
+      background: var(--ft-color-success-bg);
+      color: var(--ft-color-success);
+    }
+  }
+
+  .amount {
+    font-weight: 600;
+    font-size: var(--ft-font-size-md);
   }
 }
 
-/* =========================
-   Chart Card
-========================= */
-
-.chart-card {
+// Contenedor de la gráfica
+.chart-container {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ft-color-surface);
   border-radius: var(--ft-radius-lg);
-  box-shadow: var(--ft-shadow-card);
-  margin-bottom: var(--ft-space-4);
-
-  ion-card-header {
-    padding-bottom: 0;
-  }
-
-  ion-card-title {
-    font-size: var(--ft-font-size-md);
-    font-weight: 600;
-  }
-
-  .chart-placeholder {
-    height: 160px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--ft-color-text-secondary);
-
-    ion-icon {
-      font-size: 40px;
-      margin-bottom: var(--ft-space-2);
-      opacity: 0.6;
-    }
-
-    p {
-      font-size: var(--ft-font-size-sm);
-    }
-  }
-}
-
-/* =========================
-   Transactions
-========================= */
-
-.transactions-section {
-  margin-top: var(--ft-space-2);
-
-  .section-header {
-    margin-bottom: var(--ft-space-3);
-
-    h2 {
-      font-size: var(--ft-font-size-md);
-      font-weight: 600;
-      color: var(--ft-color-text-primary);
-    }
-  }
-}
-
-/* =========================
-   Empty State
-========================= */
-
-.empty-state {
-  text-align: center;
-  padding: var(--ft-space-8) var(--ft-space-4);
-  color: var(--ft-color-text-secondary);
-
-  ion-icon {
-    font-size: 48px;
-    margin-bottom: var(--ft-space-3);
-    opacity: 0.5;
-  }
-
-  h3 {
-    font-size: var(--ft-font-size-md);
-    font-weight: 600;
-    color: var(--ft-color-text-primary);
-    margin-bottom: var(--ft-space-1);
-  }
-
-  p {
-    font-size: var(--ft-font-size-sm);
-    line-height: var(--ft-line-height-base);
-  }
-}
-
-/* =========================
-   FAB
-========================= */
-
-.fab-add {
-  --background: var(--ft-color-purple);
-  --border-radius: var(--ft-radius-pill);
-  box-shadow: var(--ft-shadow-card);
+  padding: var(--ft-space-4);
 }

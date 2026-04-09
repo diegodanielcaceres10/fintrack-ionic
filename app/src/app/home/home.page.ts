@@ -4,15 +4,17 @@ import {
   IonButtons,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
-  IonFab,
-  IonFabButton,
   IonHeader,
   IonIcon,
-  IonTitle,
+  IonFab,
+  IonFabButton,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonNote,
   IonToolbar,
+  IonTitle,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -24,15 +26,22 @@ import {
     IonButtons,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonContent,
-    IonFab,
-    IonFabButton,
     IonHeader,
     IonIcon,
-    IonTitle,
+    IonFab,
+    IonFabButton,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonNote,
     IonToolbar,
+    IonTitle,
   ],
 })
-export class HomePage {}
+export class HomePage {
+  syncNow() {
+    console.log('Syncing now...');
+    // Implement your sync logic here
+  }
+}

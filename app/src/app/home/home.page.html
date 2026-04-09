@@ -1,65 +1,89 @@
-<ion-header class="app-header">
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-title>FinTrack</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear">
-        <ion-icon name="settings-outline"></ion-icon>
+      <ion-button color="primary" (click)="syncNow()">
+        <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen="true" class="home-content">
-  <!-- Balance Card -->
-  <ion-card class="balance-card">
-    <ion-card-content>
-      <p class="balance-label">Balance del mes</p>
-      <h1 class="balance-amount">€0.00</h1>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <section class="balance-container">
+    <ion-card class="balance-card">
+      <ion-card-content>
+        <span class="label">Balance Total</span>
+        <h1 class="amount">$2,450.00</h1>
 
-      <div class="balance-details">
-        <div class="income">
-          <span class="label">Ingresos</span>
-          <span class="amount">€0.00</span>
+        <div class="stats-row">
+          <div class="stat-item income">
+            <ion-icon name="arrow-up-circle"></ion-icon>
+            <div>
+              <span>Ingresos</span>
+              <p>$4,000</p>
+            </div>
+          </div>
+          <div class="stat-item expense">
+            <ion-icon name="arrow-down-circle"></ion-icon>
+            <div>
+              <span>Gastos</span>
+              <p>$1,550</p>
+            </div>
+          </div>
         </div>
+      </ion-card-content>
+    </ion-card>
+  </section>
 
-        <div class="expense">
-          <span class="label">Gastos</span>
-          <span class="amount">€0.00</span>
-        </div>
-      </div>
-    </ion-card-content>
-  </ion-card>
+  <section class="chart-section">
+    <h3 class="section-title">Gastos por Categoría</h3>
+    <div class="chart-container">
+      <canvas id="categoryDonutChart"></canvas>
+    </div>
+  </section>
 
-  <!-- Chart Placeholder -->
-  <ion-card class="chart-card">
-    <ion-card-header>
-      <ion-card-title>Resumen</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-      <div class="chart-placeholder">
-        <ion-icon name="pie-chart-outline"></ion-icon>
-        <p>No hay datos suficientes</p>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Transactions -->
-  <div class="transactions-section">
+  <section class="recent-transactions">
     <div class="section-header">
-      <h2>Últimas transacciones</h2>
+      <h3 class="section-title">Últimos Movimientos</h3>
+      <ion-button fill="clear" size="small" routerLink="/transactions"
+        >Ver todo</ion-button
+      >
     </div>
 
-    <div class="empty-state">
-      <ion-icon name="wallet-outline"></ion-icon>
-      <h3>Aún no tienes transacciones</h3>
-      <p>Agrega tu primera transacción para comenzar</p>
-    </div>
-  </div>
+    <ion-list lines="none">
+      <ion-item class="transaction-item shadow-sm">
+        <ion-icon
+          slot="start"
+          name="fast-food"
+          class="category-icon food"
+        ></ion-icon>
+        <ion-label>
+          <h2>Cena Familiar</h2>
+          <p>9 Abr 2026</p>
+        </ion-label>
+        <ion-note slot="end" color="danger" class="amount">- $45.00</ion-note>
+      </ion-item>
 
-  <!-- FAB -->
+      <ion-item class="transaction-item shadow-sm">
+        <ion-icon
+          slot="start"
+          name="briefcase"
+          class="category-icon work"
+        ></ion-icon>
+        <ion-label>
+          <h2>Salario</h2>
+          <p>8 Abr 2026</p>
+        </ion-label>
+        <ion-note slot="end" color="success" class="amount"
+          >+ $2,000.00</ion-note
+        >
+      </ion-item>
+    </ion-list>
+  </section>
+
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button class="fab-add">
+    <ion-fab-button color="primary">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
