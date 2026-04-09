@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.ft-card {
+  padding: var(--ft-space-4);
+  border-radius: var(--ft-radius-lg);
+  border: 1px solid var(--ft-color-border);
+  background: var(--ft-color-surface);
+}
+
+.ft-card--elevated {
+  box-shadow: var(--ft-shadow-card);
+}
+
+.ft-card--outlined {
+  box-shadow: none;
+}
+
+.ft-card--subtle {
+  background: color-mix(in srgb, var(--ft-color-surface) 84%, var(--ft-color-background));
+  box-shadow: none;
+}

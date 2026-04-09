@@ -1,0 +1,26 @@
+<label class="ft-amount-input">
+  <span class="ft-subtitle">{{ label }}</span>
+
+  <div
+    class="ft-amount-input__control"
+    [class.ft-amount-input__control--focused]="isFocused()"
+    [class.ft-amount-input__control--error]="!!errorText"
+  >
+    <span class="ft-amount-input__prefix">{{ currencySymbol }}</span>
+    <input
+      class="ft-amount-input__field"
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      [placeholder]="placeholder"
+      [ngModel]="displayValue()"
+      (ngModelChange)="handleInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+  </div>
+
+  <span class="ft-caption" [class.ft-amount-input__feedback--error]="!!errorText">
+    {{ errorText || helperText }}
+  </span>
+</label>

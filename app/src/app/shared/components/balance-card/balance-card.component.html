@@ -1,0 +1,18 @@
+<section class="balance-card">
+  <div class="balance-card__header">
+    <span class="ft-caption">Balance actual</span>
+    <h2 class="ft-title-xl">{{ total | currency:currencyCode:'symbol':'1.2-2':locale }}</h2>
+  </div>
+
+  <div class="balance-card__grid">
+    <article class="balance-card__metric balance-card__metric--income">
+      <span class="ft-caption">Ingresos</span>
+      <strong class="ft-title-md">{{ income | currency:currencyCode:'symbol':'1.2-2':locale }}</strong>
+    </article>
+
+    <article class="balance-card__metric balance-card__metric--expense">
+      <span class="ft-caption">Gastos</span>
+      <strong class="ft-title-md">{{ expense | currency:currencyCode:'symbol':'1.2-2':locale }}</strong>
+    </article>
+  </div>
+</section>

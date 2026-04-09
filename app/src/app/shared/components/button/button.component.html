@@ -1,0 +1,13 @@
+<button
+  class="ft-button"
+  [class]="variant"
+  [class.ft-button--block]="expand === 'block'"
+  [class.ft-button--lg]="size === 'lg'"
+  [disabled]="disabled"
+  [type]="type"
+  (click)="onClick($event)"
+>
+  <span class="ft-button__content">
+    <ng-content></ng-content>
+  </span>
+</button>

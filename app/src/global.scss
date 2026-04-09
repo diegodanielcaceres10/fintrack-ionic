@@ -1,3 +1,7 @@
+@use "./app/shared/styles/typography";
+@use "./app/shared/styles/utilities";
+@use "./app/shared/styles/states";
+
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
@@ -34,4 +38,32 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+
+html,
+body,
+ion-app,
+ion-content {
+  background: var(--ft-color-background);
+  color: var(--ft-color-text-primary);
+  font-family: var(--ft-font-family);
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ft-color-accent) 36%, transparent);
+}
+
+ion-content::part(background) {
+  background:
+    radial-gradient(circle at top right, rgba(99, 179, 237, 0.16), transparent 34%),
+    linear-gradient(180deg, var(--ft-color-background) 0%, #f7fafc 100%);
+}
