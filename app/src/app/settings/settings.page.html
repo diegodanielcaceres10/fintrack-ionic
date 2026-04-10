@@ -1,0 +1,368 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div class="toolbar__row">
+      <h1 class="toolbar__title">Settings</h1>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="settings-content">
+  <!-- ── Section: Sync mode ─────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section__label">Sync mode</p>
+
+    <div class="card">
+      <label
+        class="radio-row"
+        *ngFor="let opt of syncOptions; let last = last"
+        [class.radio-row--selected]="selectedSyncMode === opt.value"
+        [for]="'sync-' + opt.value"
+      >
+        <!-- Custom radio -->
+        <div class="radio-wrap">
+          <input
+            type="radio"
+            name="syncMode"
+            [id]="'sync-' + opt.value"
+            [value]="opt.value"
+            [checked]="selectedSyncMode === opt.value"
+            (change)="setSyncMode(opt.value)"
+            class="radio-input"
+          />
+          <span class="radio-circle">
+            <span class="radio-circle__dot"></span>
+          </span>
+        </div>
+
+        <!-- Text -->
+        <div class="radio-text">
+          <span class="radio-text__label">{{ opt.label }}</span>
+          <span class="radio-text__sub">{{ opt.subtitle }}</span>
+        </div>
+
+        <!-- Divider (all but last) -->
+        <span class="radio-row__divider" *ngIf="!last"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- ── Section: Sync status ───────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section__label">Sync status</p>
+
+    <div class="card">
+      <!-- Last synced row -->
+      <div class="status-row">
+        <div class="status-row__left">
+          <span class="status-row__icon">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path
+                d="M3.5 10A6.5 6.5 0 0 1 16 7.5M3.5 7.5A6.5 6.5 0 0 0 16 10"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 5.5l2 2-2 2"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M6 10.5l-2 2 2 2"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <div class="status-row__text">
+            <span class="status-row__name">Last synced</span>
+            <span class="status-row__sub">{{ lastSyncLabel }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card__divider"></div>
+
+      <!-- Pending records row -->
+      <div class="status-row">
+        <div class="status-row__left">
+          <span class="status-row__icon status-row__icon--amber">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle
+                cx="10"
+                cy="10"
+                r="7"
+                stroke="currentColor"
+                stroke-width="1.4"
+              />
+              <path
+                d="M10 6.5v4M10 13h.01"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <div class="status-row__text">
+            <span class="status-row__name">Pending records</span>
+            <span class="status-row__sub">Waiting to be uploaded</span>
+          </div>
+        </div>
+        <span
+          class="badge badge--amber"
+          *ngIf="pendingRecords > 0"
+          aria-label="{{ pendingRecords }} pending records"
+          >{{ pendingRecords }}</span
+        >
+        <span
+          class="badge badge--green"
+          *ngIf="pendingRecords === 0"
+          aria-label="No pending records"
+        >
+          <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path
+              d="M2 6l3 3 5-5"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+      </div>
+
+      <div class="card__divider"></div>
+
+      <!-- Sync now button -->
+      <div class="sync-btn-wrap">
+        <button
+          class="sync-btn"
+          [class.sync-btn--syncing]="syncState === 'syncing'"
+          [class.sync-btn--success]="syncState === 'success'"
+          [class.sync-btn--error]="syncState === 'error'"
+          [disabled]="syncState === 'syncing'"
+          (click)="syncNow()"
+        >
+          <!-- Spinner -->
+          <span
+            class="sync-btn__spinner"
+            *ngIf="syncState === 'syncing'"
+            aria-hidden="true"
+          ></span>
+
+          <!-- Checkmark -->
+          <svg
+            *ngIf="syncState === 'success'"
+            class="sync-btn__check"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M3 8l4 4 6-6"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          {{ syncBtnLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section: Account ───────────────────────────────────────────────── -->
+  <div class="section">
+    <p class="section__label">Account</p>
+
+    <div class="card">
+      <!-- Email row -->
+      <div class="account-row">
+        <span class="account-row__icon">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle
+              cx="10"
+              cy="7"
+              r="3"
+              stroke="currentColor"
+              stroke-width="1.4"
+            />
+            <path
+              d="M3 17c0-3 3.13-5 7-5s7 2 7 5"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <div class="account-row__text">
+          <span class="account-row__label">Signed in as</span>
+          <span class="account-row__email">{{ userEmail }}</span>
+        </div>
+      </div>
+
+      <div class="card__divider"></div>
+
+      <!-- Logout row -->
+      <button
+        class="logout-row"
+        (click)="logout()"
+        aria-label="Log out of your account"
+      >
+        <span class="logout-row__icon">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M13 14l3-4-3-4M16 10H8"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        <span class="logout-row__label">Log out</span>
+        <svg
+          class="logout-row__chevron"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M7.5 5l5 5-5 5"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- App version -->
+  <p class="app-version">Kora · v1.0.0</p>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<!-- Bottom navigation -->
+<div class="bottom-nav">
+  <button
+    class="nav-item"
+    [class.nav-item--active]="activeTab === 'home'"
+    (click)="setTab('home')"
+    aria-label="Home"
+  >
+    <svg
+      class="nav-item__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z"
+        fill="currentColor"
+      />
+    </svg>
+    <span class="nav-item__label">Home</span>
+    <span class="nav-item__dot" *ngIf="activeTab === 'home'"></span>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.nav-item--active]="activeTab === 'cards'"
+    (click)="setTab('cards')"
+    aria-label="Cards"
+  >
+    <svg
+      class="nav-item__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="6"
+        width="18"
+        height="13"
+        rx="2"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+      <path d="M3 10H21" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="17" cy="15" r="1.5" fill="currentColor" />
+    </svg>
+    <span class="nav-item__label">Cards</span>
+    <span class="nav-item__dot" *ngIf="activeTab === 'cards'"></span>
+  </button>
+
+  <button class="nav-fab" aria-label="New transaction">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 5V19M5 12H19"
+        stroke="white"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.nav-item--active]="activeTab === 'analytics'"
+    (click)="setTab('analytics')"
+    aria-label="Analytics"
+  >
+    <svg
+      class="nav-item__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 3H10V10H3V3ZM14 3H21V10H14V3ZM3 14H10V21H3V14ZM14 14H21V21H14V14Z"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+    </svg>
+    <span class="nav-item__label">Analytics</span>
+    <span class="nav-item__dot" *ngIf="activeTab === 'analytics'"></span>
+  </button>
+
+  <button
+    class="nav-item"
+    [class.nav-item--active]="activeTab === 'profile'"
+    (click)="setTab('profile')"
+    aria-label="Profile"
+  >
+    <svg
+      class="nav-item__icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5" />
+      <path
+        d="M4 20C4 17 7.58 15 12 15C16.42 15 20 17 20 20"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    </svg>
+    <span class="nav-item__label">Profile</span>
+    <span class="nav-item__dot" *ngIf="activeTab === 'profile'"></span>
+  </button>
+</div>

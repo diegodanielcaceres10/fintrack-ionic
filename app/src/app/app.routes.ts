@@ -18,6 +18,11 @@ export const routes: Routes = [
       import('./budget/budget.page').then((m) => m.BudgetPage),
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./settings/settings.page').then((m) => m.SettingsPage),
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
