@@ -195,3 +195,8 @@
     <span class="nav-item__dot" *ngIf="activeTab === 'profile'"></span>
   </button>
 </div>
+<app-add-transaction
+  #addSheet
+  (saved)="onTransactionSaved($event)"
+  (closed)="onSheetClosed()"
+/>

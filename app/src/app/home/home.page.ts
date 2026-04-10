@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
 import { Chart, DoughnutController, ArcElement, Tooltip } from 'chart.js';
+import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
@@ -30,12 +31,18 @@ interface CategoryStat {
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonHeader, IonToolbar],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    AddTransactionComponent,
+  ],
 })
 export class HomePage implements OnInit, AfterViewInit {
   @ViewChild('donutCanvas', { static: false })
   donutCanvas!: ElementRef<HTMLCanvasElement>;
-
+  @ViewChild('addSheet') addSheet!: AddTransactionComponent;
   activeTab: 'home' | 'cards' | 'analytics' | 'profile' = 'home';
 
   balance = 12840;
@@ -139,5 +146,14 @@ export class HomePage implements OnInit, AfterViewInit {
 
   formatBalance(value: number): string {
     return `$${value.toLocaleString('en-US')}`;
+  }
+
+  onSheetClosed(): void {
+    // Placeholder for any actions needed when the add transaction sheet is closed
+  }
+
+  onTransactionSaved(payload: any): void {
+    // Placeholder for handling the saved transaction data
+    console.log('Transaction saved:', payload);
   }
 }

@@ -1,0 +1,193 @@
+<!-- Overlay -->
+<div
+  class="overlay"
+  *ngIf="visible"
+  [@overlay]
+  (click)="close()"
+  aria-hidden="true"
+></div>
+
+<!-- Bottom sheet -->
+<div
+  class="sheet"
+  #sheet
+  *ngIf="visible"
+  [@sheet]
+  role="dialog"
+  aria-modal="true"
+  aria-label="Add transaction"
+>
+  <!-- Drag handle -->
+  <div
+    class="sheet__handle-area"
+    (touchstart)="onDragStart($event)"
+    (touchmove)="onDragMove($event)"
+    (touchend)="onDragEnd()"
+    (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)"
+    (mouseup)="onDragEnd()"
+  >
+    <div class="sheet__handle" aria-hidden="true"></div>
+  </div>
+
+  <!-- Header row -->
+  <div class="sheet__header">
+    <h2 class="sheet__title">Add transaction</h2>
+    <button class="sheet__close" (click)="close()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M18 6L6 18M6 6l12 12"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Type pills -->
+  <div class="type-pills" role="group" aria-label="Transaction type">
+    <button
+      class="type-pill"
+      [class.type-pill--expense]="type === 'expense'"
+      [class.type-pill--active]="type === 'expense'"
+      (click)="setType('expense')"
+      [attr.aria-pressed]="type === 'expense'"
+    >
+      Expense
+    </button>
+    <button
+      class="type-pill"
+      [class.type-pill--income]="type === 'income'"
+      [class.type-pill--active]="type === 'income'"
+      (click)="setType('income')"
+      [attr.aria-pressed]="type === 'income'"
+    >
+      Income
+    </button>
+  </div>
+
+  <!-- Amount card -->
+  <div class="amount-card" [class.amount-card--income]="type === 'income'">
+    <p class="amount-card__hint">
+      {{ type === 'expense' ? 'How much did you spend?' : 'How much did you
+      receive?' }}
+    </p>
+    <div class="amount-card__row">
+      <span class="amount-card__currency">$</span>
+      <input
+        #amountInput
+        class="amount-card__input"
+        type="text"
+        inputmode="decimal"
+        placeholder="0"
+        [value]="amountRaw"
+        (input)="onAmountInput($event)"
+        aria-label="Amount"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+
+  <!-- Category pills -->
+  <div class="field-group">
+    <p class="field-group__label">Category</p>
+    <div class="category-strip" role="listbox" aria-label="Category">
+      <button
+        class="cat-pill"
+        *ngFor="let cat of categories"
+        [class.cat-pill--active]="selectedCategoryId === cat.id"
+        (click)="selectCategory(cat.id)"
+        role="option"
+        [attr.aria-selected]="selectedCategoryId === cat.id"
+      >
+        <span class="cat-pill__icon">{{ cat.icon }}</span>
+        <span class="cat-pill__label">{{ cat.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Note field -->
+  <div class="field-group">
+    <p class="field-group__label">
+      Note <span class="field-group__optional">(optional)</span>
+    </p>
+    <div class="input-row">
+      <svg
+        class="input-row__icon"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M4 6h12M4 10h8M4 14h5"
+          stroke="currentColor"
+          stroke-width="1.4"
+          stroke-linecap="round"
+        />
+      </svg>
+      <input
+        class="input-row__field"
+        type="text"
+        placeholder="What was this for?"
+        [(ngModel)]="note"
+        maxlength="120"
+        aria-label="Note"
+      />
+    </div>
+  </div>
+
+  <!-- Date field -->
+  <div class="field-group">
+    <p class="field-group__label">Date</p>
+    <div class="input-row">
+      <svg
+        class="input-row__icon"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+      >
+        <rect
+          x="3"
+          y="4"
+          width="14"
+          height="14"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.4"
+        />
+        <path
+          d="M3 8h14M7 3v2M13 3v2"
+          stroke="currentColor"
+          stroke-width="1.4"
+          stroke-linecap="round"
+        />
+      </svg>
+      <input
+        class="input-row__field input-row__field--date"
+        type="date"
+        [(ngModel)]="date"
+        aria-label="Date"
+      />
+    </div>
+  </div>
+
+  <!-- CTA button -->
+  <div class="sheet__footer">
+    <button
+      class="cta-btn"
+      [class.cta-btn--income]="type === 'income'"
+      [class.cta-btn--disabled]="!isValid"
+      [disabled]="!isValid"
+      (click)="submit()"
+    >
+      <span *ngIf="isValid">
+        {{ type === 'expense' ? 'Add expense' : 'Add income' }}
+        <span class="cta-btn__amount" *ngIf="amountValue > 0"
+          >&nbsp;·&nbsp;${{ amountValue | number:'1.0-2' }}</span
+        >
+      </span>
+      <span *ngIf="!isValid">Enter an amount to continue</span>
+    </button>
+  </div>
+</div>
