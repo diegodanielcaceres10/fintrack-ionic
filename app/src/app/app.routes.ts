@@ -13,6 +13,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'budget',
+    loadComponent: () =>
+      import('./budget/budget.page').then((m) => m.BudgetPage),
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
