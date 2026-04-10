@@ -1,114 +1,409 @@
-// Contenedor principal de la tarjeta de balance
-.balance-card {
-  background: var(--ft-color-primary); // Uso de tus variables
-  color: white;
-  border-radius: var(--ft-radius-lg);
-  box-shadow: var(--ft-shadow-card);
-  margin: 0;
-  padding: var(--ft-space-2);
+// ─────────────────────────────────────────────
+// Design tokens
+// ─────────────────────────────────────────────
 
-  .label {
-    font-size: var(--ft-font-size-sm);
-    opacity: 0.8;
-    display: block;
-    margin-bottom: var(--ft-space-1);
+$color-accent:       #4F46E5;
+$color-accent-light: #818CF8;
+$color-surface:      #ffffff;
+$color-bg:           #F8F8FC;
+$color-border:       #EEEDF8;
+$color-text-primary: #1A1837;
+$color-text-muted:   #9B99B8;
+$color-text-body:    #6B6A85;
+$color-green:        #22C55E;
+$color-red:          #EF4444;
+
+$radius-sm:          12px;
+$radius-md:          14px;
+$radius-lg:          18px;
+$radius-full:        9999px;
+
+// ─────────────────────────────────────────────
+// ion-header / ion-toolbar
+// ─────────────────────────────────────────────
+
+ion-header {
+  ion-toolbar {
+    --background:    #{$color-surface};
+    --border-width:  0;
+    --padding-start: 0;
+    --padding-end:   0;
+    --padding-top:   0;
+    --padding-bottom: 0;
+    padding: 16px 20px 12px;
   }
+}
 
-  .amount {
-    font-size: var(--ft-font-size-2xl);
-    font-weight: 700;
-    margin-bottom: var(--ft-space-6);
-  }
-
-  .stats-row {
+.header {
+  &__row {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: var(--ft-space-4);
-    background: rgba(255, 255, 255, 0.1);
-    padding: var(--ft-space-4);
-    border-radius: var(--ft-radius-md);
+  }
 
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: var(--ft-space-2);
-
-      ion-icon {
-        font-size: 24px;
-      }
-
-      span {
-        font-size: var(--ft-font-size-xs);
-        display: block;
-      }
-
-      p {
-        margin: 0;
-        font-weight: 600;
-      }
-
-      &.income ion-icon {
-        color: var(--ft-color-success-light);
-      }
-      &.expense ion-icon {
-        color: var(--ft-color-danger-light);
-      }
-    }
+  &__avatar-wrap {
+    position: relative;
+    display: inline-flex;
   }
 }
 
-// Estilo de secciones
-.section-title {
-  font-size: var(--ft-font-size-lg);
-  font-weight: 600;
-  color: var(--ft-color-text-primary);
-  margin: var(--ft-space-6) 0 var(--ft-space-3);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-// Lista de transacciones (MVP 1 Polish)
-.transaction-item {
-  --background: var(--ft-color-surface);
-  --padding-start: var(--ft-space-4);
-  --inner-padding-end: var(--ft-space-4);
-  border-radius: var(--ft-radius-md);
-  margin-bottom: var(--ft-space-3);
-  border: 1px solid var(--ft-color-border);
-
-  .category-icon {
-    padding: var(--ft-space-2);
-    border-radius: var(--ft-radius-sm);
-    background: var(--ft-color-border);
-    color: var(--ft-color-primary);
-
-    &.food {
-      background: var(--ft-color-danger-bg);
-      color: var(--ft-color-danger);
-    }
-    &.work {
-      background: var(--ft-color-success-bg);
-      color: var(--ft-color-success);
-    }
+.greeting {
+  &__sub {
+    font-size: 12px;
+    color: $color-text-muted;
+    font-weight: 400;
+    margin-bottom: 2px;
   }
 
-  .amount {
+  &__name {
+    font-size: 19px;
     font-weight: 600;
-    font-size: var(--ft-font-size-md);
+    color: $color-text-primary;
   }
 }
 
-// Contenedor de la gráfica
-.chart-container {
-  height: 200px;
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: $radius-full;
+  background: $color-accent;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ft-color-surface);
-  border-radius: var(--ft-radius-lg);
-  padding: var(--ft-space-4);
+  font-weight: 600;
+  font-size: 15px;
+  color: $color-surface;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-full;
+  background: $color-red;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1.5px solid $color-surface;
+}
+
+// ─────────────────────────────────────────────
+// ion-content
+// ─────────────────────────────────────────────
+
+.dashboard-content {
+  --background: #{$color-bg};
+  --padding-bottom: 90px; // clears the fixed bottom nav
+}
+
+// ─────────────────────────────────────────────
+// Metric cards
+// ─────────────────────────────────────────────
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 20px 0;
+}
+
+.metric-card {
+  background: $color-surface;
+  border-radius: $radius-lg;
+  padding: 16px;
+  border: 1px solid $color-border;
+
+  &--accent {
+    background: $color-accent;
+    border-color: $color-accent;
+
+    .metric-card__label  { color: rgba(255, 255, 255, 0.65); }
+    .metric-card__value  { color: $color-surface; }
+    .metric-card__change { color: rgba(255, 255, 255, 0.75); }
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 500;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  &__value {
+    font-size: 22px;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__change {
+    font-size: 11px;
+    margin-top: 5px;
+    font-weight: 500;
+
+    &--up   { color: $color-green; }
+    &--down { color: $color-red; }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Section title
+// ─────────────────────────────────────────────
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text-primary;
+  padding: 20px 20px 12px;
+  margin: 0;
+}
+
+// ─────────────────────────────────────────────
+// Donut chart card
+// ─────────────────────────────────────────────
+
+.chart-card {
+  background: $color-surface;
+  border-radius: $radius-lg;
+  margin: 0 20px;
+  border: 1px solid $color-border;
+  padding: 20px;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+}
+
+.donut-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  &__label {
+    font-size: 10px;
+    color: $color-text-muted;
+  }
+
+  &__value {
+    font-size: 16px;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Legend
+// ─────────────────────────────────────────────
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-size: 12px;
+    color: $color-text-body;
+    flex: 1;
+  }
+
+  &__pct {
+    font-size: 12px;
+    font-weight: 500;
+    color: $color-text-primary;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Transaction list
+// ─────────────────────────────────────────────
+
+.txn-list {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+}
+
+.txn-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $color-surface;
+  padding: 13px 14px;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+
+  &__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+
+    &--indigo { background: #EEF2FF; }
+    &--green  { background: #F0FDF4; }
+    &--amber  { background: #FFFBEB; }
+    &--red    { background: #FFF1F2; }
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 500;
+    color: $color-text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  &__date {
+    font-size: 11px;
+    color: $color-text-muted;
+    margin: 2px 0 0;
+  }
+
+  &__amount {
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+
+    &--neg { color: $color-red; }
+    &--pos { color: $color-green; }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Bottom spacer (inside ion-content)
+// ─────────────────────────────────────────────
+
+.bottom-spacer {
+  height: 16px;
+}
+
+// ─────────────────────────────────────────────
+// Bottom navigation (fixed, outside ion-content)
+// ─────────────────────────────────────────────
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: $color-surface;
+  border-top: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+
+  // Push it inside the ion-router-outlet on tablet/desktop if needed
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 48px;
+  position: relative;
+  color: $color-text-muted;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+
+  &--active {
+    color: $color-accent;
+
+    .nav-item__label { color: $color-accent; }
+  }
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  &__label {
+    font-size: 10px;
+    color: inherit;
+    font-weight: 500;
+  }
+
+  &__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: $radius-full;
+    background: $color-accent;
+    margin-top: -2px;
+  }
+}
+
+.nav-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: $radius-full;
+  background: $color-accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: -22px;
+  flex-shrink: 0;
+  border: none;
+  transition: opacity 0.15s ease;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover  { opacity: 0.9; }
+  &:active { opacity: 0.8; }
 }
