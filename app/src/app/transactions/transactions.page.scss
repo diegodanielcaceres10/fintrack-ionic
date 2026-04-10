@@ -1,0 +1,504 @@
+// ─────────────────────────────────────────────
+// Design tokens
+// ─────────────────────────────────────────────
+
+$color-accent: #4f46e5;
+$color-surface: #ffffff;
+$color-bg: #f8f9fb;
+$color-border: #eeedf8;
+$color-text-primary: #1a1837;
+$color-text-muted: #9b99b8;
+$color-text-body: #6b6a85;
+$color-green: #16a34a;
+$color-red: #e11d48;
+
+$radius-sm: 10px;
+$radius-md: 14px;
+$radius-lg: 18px;
+$radius-full: 9999px;
+
+// ─────────────────────────────────────────────
+// ion-header / ion-toolbar
+// ─────────────────────────────────────────────
+
+ion-header {
+  ion-toolbar {
+    --background: #{$color-surface};
+    --border-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    padding: 16px 20px 0;
+  }
+}
+
+// Title row
+.toolbar {
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-sm;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $color-text-body;
+    padding: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Search bar
+// ─────────────────────────────────────────────
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+
+  &__icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  &__input {
+    width: 100%;
+    height: 40px;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 0 36px 0 38px;
+    font-family: inherit;
+    font-size: 13px;
+    color: $color-text-primary;
+    outline: none;
+    appearance: none;
+
+    &::placeholder {
+      color: $color-text-muted;
+    }
+
+    &:focus {
+      border-color: $color-accent;
+      background: $color-surface;
+    }
+
+    // Hide native clear button
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Month strip
+// ─────────────────────────────────────────────
+
+.month-strip {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 -20px;
+  padding: 0 20px 14px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &__item {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: $radius-full;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s,
+      border-color 0.15s;
+
+    &--active {
+      background: $color-accent;
+      border-color: $color-accent;
+      color: #ffffff;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Filter pills
+// ─────────────────────────────────────────────
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 14px;
+}
+
+.pill {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: $radius-full;
+  border: 1px solid $color-border;
+  background: $color-surface;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-text-body;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+
+  &--active {
+    background: $color-accent;
+    border-color: $color-accent;
+    color: #ffffff;
+  }
+}
+
+// ─────────────────────────────────────────────
+// ion-content
+// ─────────────────────────────────────────────
+
+.txn-content {
+  --background: #{$color-bg};
+  --padding-bottom: 90px;
+}
+
+// ─────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+
+  &__icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin: 0 0 6px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: $color-text-muted;
+    margin: 0;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Transaction group
+// ─────────────────────────────────────────────
+
+.txn-group {
+  margin-bottom: 8px;
+}
+
+// Day header
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px 8px;
+
+  &__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $color-text-muted;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: $color-border;
+  }
+
+  &__total {
+    font-size: 12px;
+    font-weight: 600;
+    color: $color-red;
+    white-space: nowrap;
+
+    &--pos {
+      color: $color-green;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Transaction list & rows
+// ─────────────────────────────────────────────
+
+.txn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.txn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $color-surface;
+  padding: 12px 14px;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+
+  // Category icon
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  // Name + category pill
+  &__meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 500;
+    color: $color-text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  &__category-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    padding: 0 7px;
+    border-radius: $radius-full;
+    font-size: 10px;
+    font-weight: 500;
+    width: fit-content;
+  }
+
+  // Amount + sync status
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__amount {
+    font-size: 13px;
+    font-weight: 600;
+
+    &--neg {
+      color: $color-red;
+    }
+    &--pos {
+      color: $color-green;
+    }
+  }
+
+  // Sync indicator
+  &__sync {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: $radius-full;
+
+    &--synced {
+      background: #f0fdf4;
+      color: $color-green;
+
+      svg {
+        width: 10px;
+        height: 10px;
+      }
+    }
+
+    &--pending {
+      background: #fffbeb;
+    }
+  }
+
+  &__sync-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: $radius-full;
+    background: #d97706;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Bottom spacer
+// ─────────────────────────────────────────────
+
+.bottom-spacer {
+  height: 16px;
+}
+
+// ─────────────────────────────────────────────
+// Bottom navigation
+// ─────────────────────────────────────────────
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: $color-surface;
+  border-top: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 48px;
+  position: relative;
+  color: $color-text-muted;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+
+  &--active {
+    color: $color-accent;
+    .nav-item__label {
+      color: $color-accent;
+    }
+  }
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  &__label {
+    font-size: 10px;
+    color: inherit;
+    font-weight: 500;
+  }
+
+  &__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: $radius-full;
+    background: $color-accent;
+    margin-top: -2px;
+  }
+}
+
+.nav-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: $radius-full;
+  background: $color-accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: -22px;
+  flex-shrink: 0;
+  border: none;
+  transition: opacity 0.15s ease;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
+    opacity: 0.8;
+  }
+}
