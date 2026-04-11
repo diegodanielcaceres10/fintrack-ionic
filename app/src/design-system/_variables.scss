@@ -1,0 +1,175 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _variables.scss
+// Raw design tokens as SCSS variables.
+// Import this file anywhere you need compile-time access to values
+// (e.g. inside mixins, @if conditions, calc() expressions).
+//
+// DO NOT use these directly in component styles — use the CSS custom
+// properties defined in _tokens.scss instead, so dark mode works correctly.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Brand palette ────────────────────────────────────────────────────────────
+// Indigo — primary accent
+$indigo-50: #eeeeff;
+$indigo-100: #d5d6ff;
+$indigo-200: #ababf5;
+$indigo-300: #8480f0;
+$indigo-400: #6360ea;
+$indigo-500: #4f46e5; // ← brand base
+$indigo-600: #3d35c8;
+$indigo-700: #2d27a0;
+$indigo-800: #1e1a73;
+$indigo-900: #110f45;
+
+// Green — income / success / safe
+$green-50: #f0fdf4;
+$green-100: #dcfce7;
+$green-200: #bbf7d0;
+$green-300: #86efac;
+$green-400: #4ade80;
+$green-500: #22c55e;
+$green-600: #16a34a; // ← text on light bg
+$green-700: #15803d;
+$green-800: #166534;
+$green-900: #14532d;
+
+// Red — danger / expense amount
+$red-50: #fef2f2;
+$red-100: #fee2e2;
+$red-200: #fecaca;
+$red-300: #fca5a5;
+$red-400: #f87171;
+$red-500: #ef4444;
+$red-600: #dc2626; // ← text on light bg
+$red-700: #b91c1c;
+$red-800: #991b1b;
+$red-900: #7f1d1d;
+
+// Amber — warning / pending
+$amber-50: #fffbeb;
+$amber-100: #fef3c7;
+$amber-200: #fde68a;
+$amber-300: #fcd34d;
+$amber-400: #fbbf24;
+$amber-500: #f59e0b;
+$amber-600: #d97706; // ← text on light bg
+$amber-700: #b45309;
+$amber-800: #92400e;
+$amber-900: #78350f;
+
+// Orange — due today
+$orange-50: #fff7ed;
+$orange-100: #ffedd5;
+$orange-200: #fed7aa;
+$orange-300: #fdba74;
+$orange-400: #fb923c;
+$orange-500: #f97316;
+$orange-600: #ea580c; // ← text on light bg
+$orange-700: #c2410c;
+$orange-800: #9a3412;
+$orange-900: #7c2d12;
+
+// Neutral — surfaces, text, borders
+$neutral-0: #ffffff;
+$neutral-50: #f8f9fb;
+$neutral-100: #f1f0f8;
+$neutral-200: #eeedf8; // ← border default
+$neutral-300: #d5d4e8;
+$neutral-400: #a8a7c0;
+$neutral-500: #7c7b95;
+$neutral-600: #6b6a85; // ← text body
+$neutral-700: #4e4d65;
+$neutral-800: #2e2d45;
+$neutral-900: #1a1837; // ← text primary
+$neutral-950: #0d0c1f;
+
+// Dark mode surfaces (not neutrals — slightly purple-tinted)
+$dark-50: #1c1b2e;
+$dark-100: #22213a;
+$dark-200: #2a2940;
+$dark-300: #32304e;
+$dark-400: #3d3b5c;
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-family-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+
+$font-size-xs: 10px;
+$font-size-sm: 11px;
+$font-size-base: 13px;
+$font-size-md: 14px;
+$font-size-lg: 15px;
+$font-size-xl: 17px;
+$font-size-2xl: 19px;
+$font-size-3xl: 22px;
+$font-size-display: 28px;
+$font-size-hero: 48px;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.2;
+$line-height-snug: 1.4;
+$line-height-normal: 1.6;
+
+$letter-spacing-tight: -0.3px;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.4px;
+$letter-spacing-wider: 0.6px;
+
+// ─── Spacing scale ────────────────────────────────────────────────────────────
+$space-1: 2px;
+$space-2: 4px;
+$space-3: 6px;
+$space-4: 8px;
+$space-5: 10px;
+$space-6: 12px;
+$space-7: 14px;
+$space-8: 16px;
+$space-9: 18px;
+$space-10: 20px;
+$space-12: 24px;
+$space-14: 28px;
+$space-16: 32px;
+$space-20: 40px;
+$space-24: 48px;
+
+// ─── Border radius ────────────────────────────────────────────────────────────
+$radius-xs: 6px;
+$radius-sm: 10px;
+$radius-md: 14px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+$radius-2xl: 28px;
+$radius-full: 9999px;
+
+// ─── Shadows (for reference — not used in flat design, but useful for modals) ─
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.07);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+$shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.18);
+
+// ─── Z-index scale ────────────────────────────────────────────────────────────
+$z-base: 0;
+$z-raised: 10;
+$z-dropdown: 50;
+$z-sticky: 100;
+$z-overlay: 200;
+$z-modal: 201;
+$z-toast: 300;
+
+// ─── Transitions ─────────────────────────────────────────────────────────────
+$transition-fast: 0.12s ease;
+$transition-base: 0.18s ease;
+$transition-slow: 0.28s ease;
+$transition-sheet: 320ms cubic-bezier(0.32, 0.72, 0, 1);
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+$nav-height: 64px; // bottom nav bar
+$header-height: 56px;
+$fab-size: 52px;
+$page-padding-x: 20px;

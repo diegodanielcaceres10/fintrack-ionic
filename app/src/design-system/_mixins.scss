@@ -1,0 +1,348 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _mixins.scss
+// Reusable patterns extracted from the app pages.
+// Import in any component that needs them.
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use "variables" as v;
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+
+@mixin text-xs {
+  font-size: v.$font-size-xs;
+  line-height: v.$line-height-tight;
+}
+@mixin text-sm {
+  font-size: v.$font-size-sm;
+  line-height: v.$line-height-snug;
+}
+@mixin text-base {
+  font-size: v.$font-size-base;
+  line-height: v.$line-height-normal;
+}
+@mixin text-md {
+  font-size: v.$font-size-md;
+  line-height: v.$line-height-normal;
+}
+@mixin text-lg {
+  font-size: v.$font-size-lg;
+  line-height: v.$line-height-snug;
+}
+@mixin text-xl {
+  font-size: v.$font-size-xl;
+  line-height: v.$line-height-tight;
+}
+@mixin text-2xl {
+  font-size: v.$font-size-2xl;
+  line-height: v.$line-height-tight;
+}
+@mixin text-3xl {
+  font-size: v.$font-size-3xl;
+  line-height: v.$line-height-tight;
+}
+
+@mixin label-uppercase {
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: v.$letter-spacing-wider;
+  color: var(--color-text-muted);
+}
+
+@mixin truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ─── Layout helpers ───────────────────────────────────────────────────────────
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start($gap: 0) {
+  display: flex;
+  align-items: center;
+  @if $gap > 0 {
+    gap: $gap;
+  }
+}
+
+@mixin page-padding {
+  padding-left: v.$page-padding-x;
+  padding-right: v.$page-padding-x;
+}
+
+// Hide scrollbar cross-browser
+@mixin no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Safe area for bottom nav on iPhone
+@mixin safe-bottom($base: 10px) {
+  padding-bottom: calc(#{$base} + env(safe-area-inset-bottom));
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
+@mixin card($radius: v.$radius-md) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $radius;
+}
+
+@mixin card-section-padding {
+  padding: v.$space-7 v.$space-7; // 14px all round
+}
+
+// ─── Semantic color badges ────────────────────────────────────────────────────
+// Usage:  @include badge('success')
+//         @include badge('warning')
+//         @include badge('danger')
+//         @include badge('notice')
+//         @include badge('accent')
+
+@mixin badge($variant: "accent") {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 v.$space-4;
+  border-radius: v.$radius-full;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+
+  @if $variant == "success" {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid var(--color-success-border);
+  } @else if $variant == "warning" {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning-border);
+  } @else if $variant == "danger" {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger-border);
+  } @else if $variant == "notice" {
+    background: var(--color-notice-bg);
+    color: var(--color-notice);
+    border: 1px solid var(--color-notice-border);
+  } @else {
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+  }
+}
+
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+// Usage: apply to the track element, then add __fill child
+
+@mixin progress-track($height: 4px) {
+  height: $height;
+  background: var(--color-bg);
+  border-radius: v.$radius-full;
+  overflow: hidden;
+}
+
+@mixin progress-fill($variant: "safe") {
+  height: 100%;
+  border-radius: v.$radius-full;
+  transition: width 0.4s ease;
+
+  @if $variant == "safe" {
+    background: var(--color-success);
+  }
+  @if $variant == "warning" {
+    background: var(--color-warning);
+  }
+  @if $variant == "danger" {
+    background: var(--color-danger);
+  }
+}
+
+// ─── Icon container ───────────────────────────────────────────────────────────
+
+@mixin icon-wrap($size: 38px, $radius: v.$radius-sm) {
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  background: var(--color-bg);
+  @include flex-center;
+  flex-shrink: 0;
+}
+
+// ─── Input field ─────────────────────────────────────────────────────────────
+
+@mixin input-base {
+  width: 100%;
+  height: 46px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
+  padding: 0 v.$space-7;
+  font-family: inherit;
+  font-size: v.$font-size-md;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color v.$transition-fast;
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+  &:focus {
+    border-color: var(--color-border-focus);
+  }
+}
+
+// ─── Button variants ─────────────────────────────────────────────────────────
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-2;
+  font-family: inherit;
+  font-weight: v.$font-weight-semibold;
+  cursor: pointer;
+  border: none;
+  transition: opacity v.$transition-fast;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+@mixin btn-primary($color: var(--color-accent)) {
+  @include btn-base;
+  background: $color;
+  color: var(--color-text-inverse);
+  border-radius: v.$radius-md;
+  height: 52px;
+  font-size: v.$font-size-lg;
+
+  &:not(:disabled):hover {
+    opacity: 0.92;
+  }
+  &:not(:disabled):active {
+    opacity: 0.84;
+  }
+}
+
+@mixin btn-ghost($color: var(--color-accent)) {
+  @include btn-base;
+  background: transparent;
+  color: $color;
+  border: 1px solid $color;
+  border-radius: v.$radius-full;
+  height: 34px;
+  font-size: v.$font-size-base;
+
+  &:hover {
+    background: var(--color-accent-muted);
+  }
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+@mixin btn-icon($size: 34px, $radius: v.$radius-sm) {
+  @include btn-base;
+  @include flex-center;
+  width: $size;
+  height: $size;
+  border-radius: $radius;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-body);
+
+  &:hover {
+    background: var(--color-border);
+  }
+}
+
+// ─── ion-toolbar reset ────────────────────────────────────────────────────────
+// Apply once per page — resets all Ionic default toolbar padding/borders.
+
+@mixin ion-toolbar-reset(
+  $padding-x: v.$page-padding-x,
+  $padding-top: v.$space-8
+) {
+  ion-toolbar {
+    --background: var(--color-surface);
+    --border-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    padding: $padding-top $padding-x 0;
+  }
+}
+
+// ─── Bottom nav ───────────────────────────────────────────────────────────────
+
+@mixin bottom-nav-base {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: v.$z-sticky;
+  background: var(--color-nav-bg);
+  border-top: 1px solid var(--color-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: v.$space-5 v.$space-4;
+  @include safe-bottom(v.$space-5);
+}
+
+@mixin nav-item-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-2;
+  min-width: 48px;
+  color: var(--color-nav-item);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+
+  &.active,
+  &--active {
+    color: var(--color-nav-active);
+  }
+}
+
+@mixin nav-fab-base {
+  width: v.$fab-size;
+  height: v.$fab-size;
+  border-radius: v.$radius-full;
+  background: var(--color-fab-bg);
+  @include flex-center;
+  cursor: pointer;
+  margin-top: -(v.$fab-size * 0.42); // lifts FAB above nav bar
+  flex-shrink: 0;
+  border: none;
+  transition: opacity v.$transition-fast;
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
+    opacity: 0.8;
+  }
+}
