@@ -1,0 +1,136 @@
+<app-shell title="Transactions" [action]="filterAction">
+  <!-- ── Subheader: search + month + filter pills ────────────────────────── -->
+  <ng-template #subheader>
+    <!-- Search bar -->
+    <div class="search-bar">
+      <svg
+        class="search-bar__icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle
+          cx="11"
+          cy="11"
+          r="7"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M16.5 16.5L21 21"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+      <input
+        class="search-bar__input"
+        type="search"
+        placeholder="Search transactions…"
+        [(ngModel)]="searchQuery"
+        aria-label="Search transactions"
+      />
+      <button
+        *ngIf="searchQuery"
+        class="search-bar__clear"
+        (click)="searchQuery = ''"
+        aria-label="Clear search"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M18 6L6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Month strip -->
+    <div class="month-strip" role="listbox" aria-label="Filter by month">
+      <button
+        class="month-strip__item"
+        *ngFor="let m of months; let i = index"
+        [class.month-strip__item--active]="selectedMonth === i"
+        (click)="setMonth(i)"
+        role="option"
+        [attr.aria-selected]="selectedMonth === i"
+      >
+        {{ m }}
+      </button>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="filter-pills" role="group" aria-label="Transaction type">
+      <button
+        class="pill"
+        [class.pill--active]="activeFilter === 'all'"
+        (click)="setFilter('all')"
+      >
+        All
+      </button>
+      <button
+        class="pill"
+        [class.pill--active]="activeFilter === 'expenses'"
+        (click)="setFilter('expenses')"
+      >
+        Expenses
+      </button>
+      <button
+        class="pill"
+        [class.pill--active]="activeFilter === 'income'"
+        (click)="setFilter('income')"
+      >
+        Income
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- ── Empty state ───────────────────────────────────────────────────────── -->
+  <app-empty-state
+    *ngIf="groups.length === 0"
+    icon="🔍"
+    title="No transactions found"
+    subtitle="Try a different search or filter"
+  />
+
+  <!-- ── Transaction groups ────────────────────────────────────────────────── -->
+  <div class="txn-group" *ngFor="let group of groups; trackBy: trackByGroup">
+    <!-- Group header with day label + running total -->
+    <app-group-header
+      [label]="group.label"
+      [variant]="groupVariant(group.items)"
+      [total]="group.items | groupTotal"
+      [totalPositive]="group.items | groupTotal | positiveTotal"
+    />
+
+    <!-- Transaction rows -->
+    <ul class="txn-list">
+      <li *ngFor="let txn of group.items; trackBy: trackByTxn">
+        <app-list-row
+          [icon]="categoryMeta[txn.category].icon"
+          [iconBg]="categoryMeta[txn.category].bg"
+          [name]="txn.name"
+          [amount]="formatAmount(txn.amount)"
+          [amountVariant]="amountVariant(txn.amount)"
+        >
+          <!-- Sub: category pill -->
+          <span
+            class="cat-pill"
+            [style.background]="categoryMeta[txn.category].bg"
+            [style.color]="categoryMeta[txn.category].color"
+            >{{ categoryMeta[txn.category].label }}</span
+          >
+
+          <!-- Sync badge -->
+          <app-badge
+            [variant]="syncVariant(txn.syncStatus)"
+            [check]="txn.syncStatus === 'synced'"
+            size="sm"
+          />
+        </app-list-row>
+      </li>
+    </ul>
+  </div>
+</app-shell>

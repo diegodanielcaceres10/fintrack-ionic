@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
-import {
-  GroupTotalPipe,
-  PositiveTotalPipe,
-  FormatGroupTotalPipe,
-} from './transaction.pipes';
+
+import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
+import { GroupHeaderComponent } from '../../shared/components/group-header/group-header.component';
+import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { GroupTotalPipe, PositiveTotalPipe } from './transaction.pipes';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -37,12 +38,10 @@ export interface Transaction {
 }
 
 export interface TransactionGroup {
-  label: string; // e.g. "Today", "Yesterday", "Apr 8"
+  label: string;
   date: Date;
   items: Transaction[];
 }
-
-// ─── Category meta ───────────────────────────────────────────────────────────
 
 interface CategoryMeta {
   label: string;
@@ -51,28 +50,26 @@ interface CategoryMeta {
   color: string;
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-transactions',
-  templateUrl: 'transactions.page.html',
-  styleUrls: ['transactions.page.scss'],
+  templateUrl: './transactions.page.html',
+  styleUrls: ['./transactions.page.scss'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    IonContent,
-    IonHeader,
-    IonToolbar,
+    AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav
+    GroupHeaderComponent, // replaces .day-header markup
+    ListRowComponent, // replaces .txn-row markup
+    EmptyStateComponent, // replaces inline empty-state markup
+    BadgeComponent, // for sync status indicator
     GroupTotalPipe,
     PositiveTotalPipe,
-    FormatGroupTotalPipe,
   ],
 })
 export class TransactionsPage implements OnInit {
-  // ── Nav state ──────────────────────────────────────────────────────────────
-  activeTab: 'home' | 'cards' | 'analytics' | 'profile' = 'home';
-
   // ── Filter state ───────────────────────────────────────────────────────────
   searchQuery = '';
   activeFilter: FilterPill = 'all';
@@ -91,9 +88,16 @@ export class TransactionsPage implements OnInit {
     'Nov',
     'Dec',
   ];
-  selectedMonth = new Date().getMonth(); // 0-indexed
+  selectedMonth = new Date().getMonth();
 
-  // ── Category meta map ──────────────────────────────────────────────────────
+  // ── Shell action — icon-only filter button ─────────────────────────────────
+  readonly filterAction = {
+    label: 'Filter',
+    icon: 'M3 6h18M7 12h10M11 18h2',
+    variant: 'icon-only' as const,
+  };
+
+  // ── Category meta ──────────────────────────────────────────────────────────
   readonly categoryMeta: Record<TransactionCategory, CategoryMeta> = {
     housing: { label: 'Housing', icon: '🏠', bg: '#EEF2FF', color: '#4F46E5' },
     food: { label: 'Food', icon: '🛒', bg: '#F0FDF4', color: '#16A34A' },
@@ -129,7 +133,6 @@ export class TransactionsPage implements OnInit {
 
   // ── Mock data ──────────────────────────────────────────────────────────────
   private readonly allTransactions: Transaction[] = [
-    // Today (Apr 10)
     {
       id: 't01',
       name: 'Whole Foods Market',
@@ -157,7 +160,6 @@ export class TransactionsPage implements OnInit {
       type: 'income',
       syncStatus: 'synced',
     },
-    // Yesterday (Apr 9)
     {
       id: 't04',
       name: 'CVS Pharmacy',
@@ -185,7 +187,6 @@ export class TransactionsPage implements OnInit {
       type: 'expense',
       syncStatus: 'synced',
     },
-    // Apr 8
     {
       id: 't07',
       name: 'Netflix',
@@ -213,7 +214,6 @@ export class TransactionsPage implements OnInit {
       type: 'expense',
       syncStatus: 'synced',
     },
-    // Apr 7
     {
       id: 't10',
       name: 'Metro card top-up',
@@ -232,7 +232,6 @@ export class TransactionsPage implements OnInit {
       type: 'income',
       syncStatus: 'synced',
     },
-    // Apr 5
     {
       id: 't12',
       name: 'Gym membership',
@@ -251,7 +250,6 @@ export class TransactionsPage implements OnInit {
       type: 'expense',
       syncStatus: 'pending',
     },
-    // Apr 3
     {
       id: 't14',
       name: 'Rent payment',
@@ -272,7 +270,7 @@ export class TransactionsPage implements OnInit {
     },
   ];
 
-  // ── Derived: filtered & grouped ───────────────────────────────────────────
+  // ── Derived ────────────────────────────────────────────────────────────────
   get groups(): TransactionGroup[] {
     const today = new Date();
     const yesterday = new Date(today);
@@ -295,7 +293,6 @@ export class TransactionsPage implements OnInit {
       return matchesMonth && matchesFilter && matchesSearch;
     });
 
-    // Group by date string
     const map = new Map<string, Transaction[]>();
     for (const txn of filtered) {
       const key = txn.date.toDateString();
@@ -315,13 +312,12 @@ export class TransactionsPage implements OnInit {
             month: 'short',
             day: 'numeric',
           });
-
         return { label, date, items };
       })
       .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────────
   formatAmount(amount: number): string {
     const abs = Math.abs(amount).toLocaleString('en-US', {
       minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
@@ -330,14 +326,24 @@ export class TransactionsPage implements OnInit {
     return amount < 0 ? `-$${abs}` : `+$${abs}`;
   }
 
+  amountVariant(amount: number): 'income' | 'expense' {
+    return amount > 0 ? 'income' : 'expense';
+  }
+
+  syncVariant(status: SyncStatus): 'success' | 'warning' {
+    return status === 'synced' ? 'success' : 'warning';
+  }
+
+  groupVariant(items: Transaction[]): 'success' | 'danger' {
+    const total = items.reduce((s, t) => s + t.amount, 0);
+    return total >= 0 ? 'success' : 'danger';
+  }
+
   setFilter(f: FilterPill): void {
     this.activeFilter = f;
   }
   setMonth(i: number): void {
     this.selectedMonth = i;
-  }
-  setTab(t: typeof this.activeTab) {
-    this.activeTab = t;
   }
 
   trackByGroup(_: number, g: TransactionGroup): string {
