@@ -4,7 +4,7 @@
 // No hardcoded colors or sizes — dark mode works automatically.
 // ─────────────────────────────────────────────────────────────────────────────
 
-@use "../../design-system/variables" as v;
+@use "../../../../design-system/variables" as v;
 
 :host {
   display: block; // ensures the component doesn't collapse

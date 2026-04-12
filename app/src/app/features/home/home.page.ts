@@ -8,8 +8,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { Chart, DoughnutController, ArcElement, Tooltip } from 'chart.js';
 
-import { AppShellComponent } from '../shared/components/app-shell/app-shell.component';
-import { ListRowComponent } from '../shared/components/list-row/list-row.component';
+import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
+import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
