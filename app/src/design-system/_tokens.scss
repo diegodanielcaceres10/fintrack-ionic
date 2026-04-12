@@ -9,95 +9,8 @@
 
 @use "variables" as v;
 
-// ─── Light mode (default) ─────────────────────────────────────────────────────
-:root,
-[data-theme="light"] {
-  // ── Brand ──────────────────────────────────────────────────────────────────
-  --color-accent: #{v.$indigo-500}; // #4F46E5
-  --color-accent-hover: #{v.$indigo-600};
-  --color-accent-subtle: #{v.$indigo-50};
-  --color-accent-muted: rgba(#{v.$indigo-500}, 0.08);
-  --color-accent-border: rgba(#{v.$indigo-500}, 0.2);
-
-  // ── Surfaces ───────────────────────────────────────────────────────────────
-  --color-bg: #{v.$neutral-50}; // page background
-  --color-surface: #{v.$neutral-0}; // cards, sheets
-  --color-surface-raised: #{v.$neutral-0}; // elevated cards
-  --color-surface-overlay: rgba(10, 8, 30, 0.52); // bottom sheet backdrop
-
-  // ── Borders ────────────────────────────────────────────────────────────────
-  --color-border: #{v.$neutral-200}; // default border
-  --color-border-strong: #{v.$neutral-300}; // hover / focus border
-  --color-border-focus: #{v.$indigo-500};
-
-  // ── Text ───────────────────────────────────────────────────────────────────
-  --color-text-primary: #{v.$neutral-900}; // headings, values
-  --color-text-body: #{v.$neutral-600}; // labels, subtitles
-  --color-text-muted: #{v.$neutral-400}; // placeholders, hints
-  --color-text-disabled: #{v.$neutral-300};
-  --color-text-inverse: #{v.$neutral-0}; // text on dark/accent bg
-
-  // ── Semantic: success / income / safe ──────────────────────────────────────
-  --color-success: #{v.$green-600};
-  --color-success-bg: #{v.$green-50};
-  --color-success-border: #{v.$green-200};
-  --color-success-subtle: #{v.$green-100};
-
-  // ── Semantic: warning / pending ────────────────────────────────────────────
-  --color-warning: #{v.$amber-600};
-  --color-warning-bg: #{v.$amber-50};
-  --color-warning-border: #{v.$amber-200};
-  --color-warning-subtle: #{v.$amber-100};
-
-  // ── Semantic: danger / expense / overdue ───────────────────────────────────
-  --color-danger: #{v.$red-600};
-  --color-danger-bg: #{v.$red-50};
-  --color-danger-border: #{v.$red-200};
-  --color-danger-subtle: #{v.$red-100};
-
-  // ── Semantic: due today ────────────────────────────────────────────────────
-  --color-notice: #{v.$orange-600};
-  --color-notice-bg: #{v.$orange-50};
-  --color-notice-border: #{v.$orange-200};
-
-  // ── Income (positive amounts) ──────────────────────────────────────────────
-  --color-income: #{v.$green-600};
-  --color-income-accent: #{v.$green-500};
-  --color-income-bg: #{v.$green-50};
-  --color-income-border: #{v.$green-200};
-  --color-income-muted: rgba(#{v.$green-600}, 0.08);
-
-  // ── Expense (negative amounts) ────────────────────────────────────────────
-  --color-expense: #{v.$red-600};
-  --color-expense-accent: #{v.$red-500};
-  --color-expense-bg: #{v.$red-50};
-  --color-expense-border: #{v.$red-200};
-
-  // ── Nav / shell ────────────────────────────────────────────────────────────
-  --color-nav-bg: #{v.$neutral-0};
-  --color-nav-border: #{v.$neutral-200};
-  --color-nav-item: #{v.$neutral-400};
-  --color-nav-active: #{v.$indigo-500};
-  --color-fab-bg: #{v.$indigo-500};
-
-  // ── Ionic overrides ────────────────────────────────────────────────────────
-  --ion-background-color: #{v.$neutral-50};
-  --ion-text-color: #{v.$neutral-900};
-  --ion-toolbar-background: #{v.$neutral-0};
-  --ion-toolbar-border-color: transparent;
-  --ion-item-background: #{v.$neutral-0};
-  --ion-card-background: #{v.$neutral-0};
-}
-
-// ─── Dark mode ────────────────────────────────────────────────────────────────
-@media (prefers-color-scheme: dark) {
-  :root {
-    @include dark-tokens;
-  }
-}
-[data-theme="dark"] {
-  @include dark-tokens;
-}
+// ─── Dark mode mixin ──────────────────────────────────────────────────────────
+// Declared FIRST — SCSS requires a mixin to be defined before its first call.
 
 @mixin dark-tokens {
   // ── Brand ──────────────────────────────────────────────────────────────────
@@ -148,14 +61,14 @@
   --color-notice-bg: rgba(#{v.$orange-400}, 0.1);
   --color-notice-border: rgba(#{v.$orange-400}, 0.22);
 
-  // ── Income ────────────────────────────────────────────────────────────────
+  // ── Income ─────────────────────────────────────────────────────────────────
   --color-income: #{v.$green-400};
   --color-income-accent: #{v.$green-400};
   --color-income-bg: rgba(#{v.$green-400}, 0.1);
   --color-income-border: rgba(#{v.$green-400}, 0.22);
   --color-income-muted: rgba(#{v.$green-400}, 0.08);
 
-  // ── Expense ───────────────────────────────────────────────────────────────
+  // ── Expense ────────────────────────────────────────────────────────────────
   --color-expense: #{v.$red-400};
   --color-expense-accent: #{v.$red-400};
   --color-expense-bg: rgba(#{v.$red-400}, 0.1);
@@ -175,4 +88,99 @@
   --ion-toolbar-border-color: transparent;
   --ion-item-background: #{v.$dark-100};
   --ion-card-background: #{v.$dark-100};
+}
+
+// ─── Light mode (default) ─────────────────────────────────────────────────────
+:root,
+[data-theme="light"] {
+  // ── Brand ──────────────────────────────────────────────────────────────────
+  --color-accent: #{v.$indigo-500};
+  --color-accent-hover: #{v.$indigo-600};
+  --color-accent-subtle: #{v.$indigo-50};
+  --color-accent-muted: rgba(#{v.$indigo-500}, 0.08);
+  --color-accent-border: rgba(#{v.$indigo-500}, 0.2);
+
+  // ── Surfaces ───────────────────────────────────────────────────────────────
+  --color-bg: #{v.$neutral-50};
+  --color-surface: #{v.$neutral-0};
+  --color-surface-raised: #{v.$neutral-0};
+  --color-surface-overlay: rgba(10, 8, 30, 0.52);
+
+  // ── Borders ────────────────────────────────────────────────────────────────
+  --color-border: #{v.$neutral-200};
+  --color-border-strong: #{v.$neutral-300};
+  --color-border-focus: #{v.$indigo-500};
+
+  // ── Text ───────────────────────────────────────────────────────────────────
+  --color-text-primary: #{v.$neutral-900};
+  --color-text-body: #{v.$neutral-600};
+  --color-text-muted: #{v.$neutral-400};
+  --color-text-disabled: #{v.$neutral-300};
+  --color-text-inverse: #{v.$neutral-0};
+
+  // ── Semantic: success ──────────────────────────────────────────────────────
+  --color-success: #{v.$green-600};
+  --color-success-bg: #{v.$green-50};
+  --color-success-border: #{v.$green-200};
+  --color-success-subtle: #{v.$green-100};
+
+  // ── Semantic: warning ──────────────────────────────────────────────────────
+  --color-warning: #{v.$amber-600};
+  --color-warning-bg: #{v.$amber-50};
+  --color-warning-border: #{v.$amber-200};
+  --color-warning-subtle: #{v.$amber-100};
+
+  // ── Semantic: danger ───────────────────────────────────────────────────────
+  --color-danger: #{v.$red-600};
+  --color-danger-bg: #{v.$red-50};
+  --color-danger-border: #{v.$red-200};
+  --color-danger-subtle: #{v.$red-100};
+
+  // ── Semantic: notice ───────────────────────────────────────────────────────
+  --color-notice: #{v.$orange-600};
+  --color-notice-bg: #{v.$orange-50};
+  --color-notice-border: #{v.$orange-200};
+
+  // ── Income ─────────────────────────────────────────────────────────────────
+  --color-income: #{v.$green-600};
+  --color-income-accent: #{v.$green-500};
+  --color-income-bg: #{v.$green-50};
+  --color-income-border: #{v.$green-200};
+  --color-income-muted: rgba(#{v.$green-600}, 0.08);
+
+  // ── Expense ────────────────────────────────────────────────────────────────
+  --color-expense: #{v.$red-600};
+  --color-expense-accent: #{v.$red-500};
+  --color-expense-bg: #{v.$red-50};
+  --color-expense-border: #{v.$red-200};
+
+  // ── Nav / shell ────────────────────────────────────────────────────────────
+  --color-nav-bg: #{v.$neutral-0};
+  --color-nav-border: #{v.$neutral-200};
+  --color-nav-item: #{v.$neutral-400};
+  --color-nav-active: #{v.$indigo-500};
+  --color-fab-bg: #{v.$indigo-500};
+
+  // ── Ionic overrides ────────────────────────────────────────────────────────
+  --ion-background-color: #{v.$neutral-50};
+  --ion-text-color: #{v.$neutral-900};
+  --ion-toolbar-background: #{v.$neutral-0};
+  --ion-toolbar-border-color: transparent;
+  --ion-item-background: #{v.$neutral-0};
+  --ion-card-background: #{v.$neutral-0};
+}
+
+// ─── Dark mode ────────────────────────────────────────────────────────────────
+// System preference (automatic)
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include dark-tokens;
+  }
+}
+
+// Manual override — set via:
+// document.documentElement.setAttribute('data-theme', 'dark')
+// Takes priority over the media query, allowing user preference to override system.
+[data-theme="dark"] {
+  @include dark-tokens;
 }

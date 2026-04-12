@@ -1,0 +1,110 @@
+<!-- ─── Header ──────────────────────────────────────────────────────────────── -->
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <!-- Main toolbar row -->
+    <div class="shell-toolbar__row">
+      <!-- Left: title or greeting -->
+      <div class="shell-toolbar__left">
+        <!-- Greeting mode (dashboard) -->
+        <ng-container *ngIf="greeting; else plainTitle">
+          <p class="shell-toolbar__greeting-sub">{{ greetingPrefix }}</p>
+          <p class="shell-toolbar__greeting-name">{{ greeting }}</p>
+        </ng-container>
+
+        <!-- Plain title mode -->
+        <ng-template #plainTitle>
+          <h1 class="shell-toolbar__title">{{ title }}</h1>
+        </ng-template>
+      </div>
+
+      <!-- Right: avatar OR action button -->
+      <div class="shell-toolbar__right">
+        <!-- Avatar (dashboard) -->
+        <ng-container *ngIf="showAvatar">
+          <div class="shell-avatar-wrap">
+            <div class="shell-avatar">{{ avatarInitials }}</div>
+            <span
+              *ngIf="hasNotification"
+              class="shell-notif-dot"
+              aria-label="You have notifications"
+            ></span>
+          </div>
+        </ng-container>
+
+        <!-- Ghost action button -->
+        <ng-container *ngIf="action && action.variant === 'ghost'">
+          <button
+            class="shell-action-btn"
+            (click)="actionClick.emit()"
+            [attr.aria-label]="action.label"
+          >
+            <svg
+              *ngIf="action.icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                [attr.d]="action.icon"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            {{ action.label }}
+          </button>
+        </ng-container>
+
+        <!-- Icon-only action button -->
+        <ng-container *ngIf="action && action.variant === 'icon-only'">
+          <button
+            class="shell-icon-btn"
+            (click)="actionClick.emit()"
+            [attr.aria-label]="action.label"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                [attr.d]="action.icon"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!--
+      Subheader slot — projected from page via:
+        <ng-template #subheader>
+          <div class="search-bar">...</div>
+          <div class="filter-pills">...</div>
+        </ng-template>
+    -->
+    <ng-container *ngIf="subheaderTpl">
+      <ng-container *ngTemplateOutlet="subheaderTpl"></ng-container>
+    </ng-container>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ─── Content ─────────────────────────────────────────────────────────────── -->
+<ion-content [fullscreen]="fullscreen" class="page-content">
+  <!--
+    Page-specific content projected here.
+    Each page puts its full body inside <app-shell>...</app-shell>
+  -->
+  <ng-content></ng-content>
+
+  <div class="bottom-spacer"></div>
+</ion-content>
+
+<!-- ─── Bottom navigation ────────────────────────────────────────────────────── -->
+<app-bottom-nav
+  [activeTab]="activeTab"
+  (tabChange)="onTabChange($event)"
+  (fabTap)="openAddSheet()"
+/>
+
+<!-- ─── Add transaction sheet ────────────────────────────────────────────────── -->
+<app-add-transaction *ngIf="showAddSheet" (closed)="closeAddSheet()" />

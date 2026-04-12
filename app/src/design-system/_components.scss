@@ -1,0 +1,968 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _components.scss
+// Shared UI components extracted from all app pages.
+// These are global classes — import this file ONCE in styles.scss or global.scss
+// alongside design-system.scss.
+//
+// Every component uses CSS custom properties (--color-*) from _tokens.scss,
+// so dark mode works automatically with zero extra work.
+//
+// Component index:
+//   1.  Ion toolbar reset
+//   2.  Page shell (ion-content, bottom-spacer)
+//   3.  Toolbar header
+//   4.  Bottom navigation (nav-item, nav-fab)
+//   5.  Card & card-divider
+//   6.  Section label
+//   7.  Icon wrap
+//   8.  Badge (success, warning, danger, notice, accent, neutral)
+//   9.  Pill (filter / toggle)
+//   10. Segmented control (two-option toggle)
+//   11. Group header (dot + label + line + count)
+//   12. List row
+//   13. Add button (ghost CTA in toolbar)
+//   14. Input row (icon + field)
+//   15. Primary CTA button
+//   16. Progress bar
+//   17. Empty state
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use "variables" as v;
+
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+// Defined first — SCSS requires mixins to be declared before their first call.
+
+@mixin no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// ─── 1. Ion toolbar reset ─────────────────────────────────────────────────────
+// Removes all Ionic default padding, border and background from every header.
+// Applied globally so individual pages don't need to repeat it.
+
+ion-header.ion-no-border {
+  ion-toolbar {
+    --background: var(--color-surface);
+    --border-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    padding: v.$space-8 v.$page-padding-x 0; // 16px top, 20px sides
+  }
+}
+
+// ─── 2. Page shell ────────────────────────────────────────────────────────────
+
+// Generic ion-content background + bottom padding that clears the fixed nav.
+// Apply the class directly on <ion-content class="page-content">
+.page-content {
+  --background: var(--color-bg);
+  --padding-bottom: #{v.$nav-height + v.$space-5}; // 64px nav + 10px breathing room
+}
+
+// Spacer placed as the last child inside ion-content to add extra bottom breathing room.
+.bottom-spacer {
+  height: v.$space-8; // 16px
+}
+
+// ─── 3. Toolbar header ────────────────────────────────────────────────────────
+
+.toolbar {
+  // Main row: title on the left, optional action on the right
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: v.$space-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl; // 22px
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+    margin: 0;
+    line-height: v.$line-height-tight;
+  }
+
+  // Small square icon button (e.g. filter, options)
+  &__icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: v.$radius-sm;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-body);
+    padding: 0;
+    transition: background v.$transition-fast;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background: var(--color-bg);
+    }
+  }
+}
+
+// Ghost button used in toolbar to add items (e.g. "Add bill", "Add budget")
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  height: 34px;
+  padding: 0 v.$space-7;
+  border-radius: v.$radius-full;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  transition: background v.$transition-fast;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--color-accent-muted);
+  }
+  &:active {
+    background: var(--color-accent-border);
+  }
+}
+
+// ─── 4. Bottom navigation ─────────────────────────────────────────────────────
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: v.$z-sticky;
+  background: var(--color-nav-bg);
+  border-top: 1px solid var(--color-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  // 10px top padding + safe area at bottom (iPhone notch)
+  padding: v.$space-5 v.$space-4
+    calc(#{v.$space-5} + env(safe-area-inset-bottom));
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-2;
+  min-width: 48px;
+  position: relative;
+  color: var(--color-nav-item);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: color v.$transition-fast;
+
+  &--active,
+  &.active {
+    color: var(--color-nav-active);
+
+    .nav-item__label {
+      color: var(--color-nav-active);
+    }
+  }
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: v.$font-size-xs; // 10px
+    color: inherit;
+    font-weight: v.$font-weight-medium;
+  }
+
+  // Active indicator dot below the label
+  &__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: v.$radius-full;
+    background: var(--color-nav-active);
+    margin-top: -#{v.$space-1};
+  }
+}
+
+// Center FAB button that floats above the nav bar
+.nav-fab {
+  width: v.$fab-size; // 52px
+  height: v.$fab-size;
+  border-radius: v.$radius-full;
+  background: var(--color-fab-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: calc(-#{v.$fab-size} * 0.42); // lifts it above the nav bar
+  flex-shrink: 0;
+  border: none;
+  transition: opacity v.$transition-fast;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+// ─── 5. Card ──────────────────────────────────────────────────────────────────
+
+// Base surface card — white bg, 1px border, rounded corners.
+// overflow: hidden ensures child elements respect border-radius.
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-lg;
+  overflow: hidden;
+
+  // Inset horizontal divider between card rows
+  &__divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0 v.$space-8;
+  }
+
+  // Full-bleed horizontal divider (no horizontal margin)
+  &__divider--full {
+    height: 1px;
+    background: var(--color-border);
+  }
+}
+
+// Padded card variant — adds default padding inside
+.card--padded {
+  padding: v.$space-8;
+}
+
+// ─── 6. Section label ─────────────────────────────────────────────────────────
+
+// The small uppercase label above a card group (e.g. "Sync mode", "Account")
+.section {
+  padding: v.$space-10 v.$page-padding-x 0;
+
+  &__label {
+    font-size: v.$font-size-sm; // 11px
+    font-weight: v.$font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: v.$letter-spacing-wider;
+    color: var(--color-text-muted);
+    margin: 0 0 v.$space-4 4px;
+  }
+}
+
+// ─── 7. Icon wrap ─────────────────────────────────────────────────────────────
+
+// Square container for emoji or SVG icons inside list rows.
+// Sizes: sm (34px), md (38px — default), lg (42px)
+.icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: v.$radius-sm;
+  background: var(--color-bg);
+  flex-shrink: 0;
+
+  // Default (md)
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+
+  &--sm {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+  &--lg {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  // Semantic color variants (border + tinted bg)
+  &--bordered {
+    border: 1px solid var(--color-border);
+  }
+
+  &--accent {
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+  }
+
+  &--success {
+    background: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
+    color: var(--color-success);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
+    color: var(--color-warning);
+  }
+
+  &--danger {
+    background: var(--color-danger-bg);
+    border: 1px solid var(--color-danger-border);
+    color: var(--color-danger);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ─── 8. Badge ─────────────────────────────────────────────────────────────────
+
+// Inline pill used for status, counts and labels.
+// Usage: <span class="badge badge--warning">3</span>
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-1;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 v.$space-3;
+  border-radius: v.$radius-full;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  white-space: nowrap;
+  line-height: 1;
+
+  // Taller variant for text-only badges (e.g. "Paid", "Pending")
+  &--tall {
+    height: 22px;
+    padding: 0 v.$space-4;
+    font-size: v.$font-size-sm;
+  }
+
+  svg {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  // ── Semantic variants ──────────────────────────────────────────────────────
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid var(--color-success-border);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning-border);
+  }
+
+  &--danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger-border);
+  }
+
+  &--notice {
+    background: var(--color-notice-bg);
+    color: var(--color-notice);
+    border: 1px solid var(--color-notice-border);
+  }
+
+  &--accent {
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+  }
+
+  &--neutral {
+    background: var(--color-bg);
+    color: var(--color-text-body);
+    border: 1px solid var(--color-border);
+  }
+}
+
+// ─── 9. Pill ──────────────────────────────────────────────────────────────────
+
+// Horizontal scrollable filter pills (e.g. All / Expenses / Income).
+// Wrap pills in a .pill-group for horizontal scroll behavior.
+
+.pill-group {
+  display: flex;
+  gap: v.$space-3;
+  overflow-x: auto;
+  padding-bottom: v.$space-2;
+  @include no-scrollbar; // defined in _mixins.scss
+
+  // Bleed beyond page padding for edge-to-edge scroll
+  &--bleed {
+    margin: 0 (-#{v.$page-padding-x});
+    padding-left: v.$page-padding-x;
+    padding-right: v.$page-padding-x;
+  }
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  height: 32px;
+  padding: 0 v.$space-8;
+  border-radius: v.$radius-full;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-medium;
+  color: var(--color-text-body);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background v.$transition-fast,
+    color v.$transition-fast,
+    border-color v.$transition-fast;
+
+  &--active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-text-inverse);
+  }
+
+  // Smaller variant for month strips
+  &--sm {
+    height: 28px;
+    padding: 0 v.$space-6;
+    font-size: v.$font-size-sm;
+  }
+
+  svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+}
+
+// ─── 10. Segmented control ────────────────────────────────────────────────────
+
+// Two-option toggle (e.g. Status / Due date, Status / By Date)
+// Rendered as a single pill with internal active button.
+
+.segmented {
+  display: grid;
+  gap: v.$space-2;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
+  padding: 4px;
+
+  &--2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  &--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: v.$space-2;
+    height: 36px;
+    border-radius: v.$radius-sm;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      background v.$transition-fast,
+      color v.$transition-fast;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    &--active {
+      background: var(--color-surface);
+      color: var(--color-accent);
+      border: 1px solid var(--color-accent-border);
+    }
+  }
+}
+
+// ─── 11. Group header ─────────────────────────────────────────────────────────
+
+// Section divider row: colored dot + uppercase label + horizontal line + count.
+// Used in transaction list, budget list, bills list.
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: v.$space-4;
+  padding: v.$space-10 v.$page-padding-x v.$space-4;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: v.$radius-full;
+    flex-shrink: 0;
+    background: var(--color-text-muted);
+
+    // Semantic dot colors
+    &--success {
+      background: var(--color-success);
+    }
+    &--warning {
+      background: var(--color-warning);
+    }
+    &--danger {
+      background: var(--color-danger);
+    }
+    &--notice {
+      background: var(--color-notice);
+    }
+    &--accent {
+      background: var(--color-accent);
+    }
+    &--neutral {
+      background: var(--color-text-muted);
+    }
+  }
+
+  &__label {
+    font-size: v.$font-size-sm; // 11px
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: v.$letter-spacing-wider;
+    white-space: nowrap;
+  }
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  &__count {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  // Optional: total amount on the right (transactions day header)
+  &__total {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: var(--color-expense);
+
+    &--pos {
+      color: var(--color-income);
+    }
+  }
+}
+
+// ─── 12. List row ─────────────────────────────────────────────────────────────
+
+// The fundamental row pattern shared by transactions, bills, budget items,
+// and settings rows: icon | meta (name + sub) | right-side (amount + action).
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-6; // 12px
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
+  padding: v.$space-6 v.$space-7; // 12px 14px
+
+  // Muted state — used for paid bills, completed items
+  &--muted {
+    opacity: 0.52;
+  }
+
+  // Clickable / tappable row
+  &--interactive {
+    cursor: pointer;
+    transition: background v.$transition-fast;
+    &:hover {
+      background: var(--color-bg);
+    }
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-1;
+  }
+
+  &__name {
+    font-size: v.$font-size-base; // 13px
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sub {
+    font-size: v.$font-size-sm; // 11px
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: v.$space-2;
+    flex-shrink: 0;
+  }
+
+  &__amount {
+    font-size: v.$font-size-md; // 14px
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+
+    &--income {
+      color: var(--color-income);
+    }
+    &--expense {
+      color: var(--color-expense);
+    }
+  }
+
+  &__chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+}
+
+// Stacked list: removes gap between rows and rounds only top/bottom corners
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  padding: 0 v.$page-padding-x;
+  gap: 2px;
+
+  list-style: none;
+  margin: 0;
+}
+
+// ─── 13. Add button (alias) ───────────────────────────────────────────────────
+// .add-btn is already defined in section 3 (Toolbar header).
+// No duplication needed.
+
+// ─── 14. Input row ────────────────────────────────────────────────────────────
+
+// Horizontal input with a leading icon (search, date, note, etc.)
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-5;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
+  padding: 0 v.$space-7;
+  height: 46px;
+  transition: border-color v.$transition-fast;
+
+  &:focus-within {
+    border-color: var(--color-border-focus);
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  &__field {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: v.$font-size-md;
+    color: var(--color-text-primary);
+    outline: none;
+    min-width: 0;
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    // Date picker
+    &--date {
+      color-scheme: light;
+      cursor: pointer;
+
+      &::-webkit-calendar-picker-indicator {
+        opacity: 0.4;
+        cursor: pointer;
+      }
+    }
+
+    // Search — hide native clear button
+    &[type="search"]::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  // Trailing clear / action button inside the row
+  &__action {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--color-text-muted);
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ─── 15. Primary CTA button ───────────────────────────────────────────────────
+
+.btn-primary {
+  width: 100%;
+  height: 52px;
+  border-radius: v.$radius-md;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-family: inherit;
+  font-size: v.$font-size-lg;
+  font-weight: v.$font-weight-semibold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-3;
+  transition:
+    opacity v.$transition-fast,
+    background v.$transition-base;
+
+  &--income {
+    background: var(--color-income);
+  }
+  &--danger {
+    background: var(--color-danger);
+  }
+  &--success {
+    background: var(--color-success);
+  }
+
+  &--disabled,
+  &:disabled {
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    cursor: default;
+  }
+
+  &:not(:disabled):not(.btn-primary--disabled) {
+    &:hover {
+      opacity: 0.92;
+    }
+    &:active {
+      opacity: 0.84;
+    }
+  }
+
+  // Loading spinner
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: v.$radius-full;
+    animation: ds-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+}
+
+// Smaller inline variant
+.btn-sm {
+  height: 34px;
+  padding: 0 v.$space-8;
+  border-radius: v.$radius-full;
+  border: none;
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-semibold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  transition: opacity v.$transition-fast;
+
+  &--accent {
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &--danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger-border);
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// ─── 16. Progress bar ─────────────────────────────────────────────────────────
+
+.progress {
+  &__track {
+    height: 4px;
+    background: var(--color-bg);
+    border-radius: v.$radius-full;
+    overflow: hidden;
+
+    &--thick {
+      height: 6px;
+    }
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: v.$radius-full;
+    transition: width 0.4s ease;
+    background: var(--color-accent);
+
+    &--success {
+      background: var(--color-success);
+    }
+    &--warning {
+      background: var(--color-warning);
+    }
+    &--danger {
+      background: var(--color-danger);
+    }
+    &--income {
+      background: var(--color-income);
+    }
+  }
+}
+
+// ─── 17. Empty state ──────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-20 v.$space-16; // 40px 32px
+  text-align: center;
+
+  &__icon {
+    font-size: 40px;
+    margin-bottom: v.$space-8;
+    line-height: 1;
+  }
+
+  &__title {
+    font-size: v.$font-size-lg;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+    margin: 0 0 v.$space-3;
+  }
+
+  &__sub {
+    font-size: v.$font-size-base;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 240px;
+  }
+
+  &__action {
+    margin-top: v.$space-8;
+  }
+}
+
+// ─── Global keyframes ─────────────────────────────────────────────────────────
+// Prefixed with `ds-` to avoid collisions with app-level @keyframes.
+
+@keyframes ds-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ds-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

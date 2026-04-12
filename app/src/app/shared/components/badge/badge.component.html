@@ -1,0 +1,20 @@
+<span
+  class="badge"
+  [class]="'badge--' + variant + ' badge--' + size"
+  role="status"
+>
+  <!-- Optional checkmark icon -->
+  <svg *ngIf="check" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path
+      d="M2 6l3 3 5-5"
+      stroke="currentColor"
+      stroke-width="1.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+
+  <!-- Label via @Input or projected content -->
+  <ng-container *ngIf="label !== undefined">{{ label }}</ng-container>
+  <ng-content *ngIf="label === undefined"></ng-content>
+</span>

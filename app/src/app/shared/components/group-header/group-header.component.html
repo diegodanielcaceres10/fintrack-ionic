@@ -1,0 +1,28 @@
+<div class="group-header">
+  <span
+    class="group-header__dot"
+    [class]="'group-header__dot--' + variant"
+    aria-hidden="true"
+  ></span>
+
+  <span class="group-header__label">{{ label }}</span>
+
+  <span class="group-header__line" aria-hidden="true"></span>
+
+  <!-- Count -->
+  <span
+    *ngIf="showCount"
+    class="group-header__count"
+    aria-label="{{ count }} items"
+    >{{ count }}</span
+  >
+
+  <!-- Total amount -->
+  <span
+    *ngIf="showTotal"
+    class="group-header__total"
+    [class.group-header__total--pos]="totalPositive"
+    aria-label="Total: {{ formatTotal(total!) }}"
+    >{{ formatTotal(total!) }}</span
+  >
+</div>

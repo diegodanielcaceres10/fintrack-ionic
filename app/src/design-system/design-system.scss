@@ -1,0 +1,186 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// design-system.scss
+// Single entry point — import this file in styles.scss (global).
+// Components should @use individual partials directly (see usage below).
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use "variables" as v;
+@use "tokens"; // writes :root { --color-* } to global CSS
+@use "mixins";
+@use "components"; // global shared UI classes — no @use needed in components
+
+// ─── Global resets ────────────────────────────────────────────────────────────
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-base;
+  line-height: v.$line-height-normal;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+// ─── Global utility classes ───────────────────────────────────────────────────
+// Use sparingly — prefer component-scoped styles.
+
+.text-primary {
+  color: var(--color-text-primary) !important;
+}
+.text-body {
+  color: var(--color-text-body) !important;
+}
+.text-muted {
+  color: var(--color-text-muted) !important;
+}
+.text-accent {
+  color: var(--color-accent) !important;
+}
+.text-success {
+  color: var(--color-success) !important;
+}
+.text-warning {
+  color: var(--color-warning) !important;
+}
+.text-danger {
+  color: var(--color-danger) !important;
+}
+.text-income {
+  color: var(--color-income) !important;
+}
+.text-expense {
+  color: var(--color-expense) !important;
+}
+
+.bg-surface {
+  background: var(--color-surface) !important;
+}
+.bg-page {
+  background: var(--color-bg) !important;
+}
+
+.page-padding {
+  padding-left: v.$page-padding-x;
+  padding-right: v.$page-padding-x;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USAGE GUIDE
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// 1. GLOBAL SETUP (styles.scss or global.scss in Ionic)
+// ─────────────────────────────────────────────────────
+//    @use 'design-system/design-system';
+//
+//
+// 2. IN A COMPONENT SCSS (e.g. dashboard.page.scss)
+// ──────────────────────────────────────────────────
+//    @use '../design-system/variables' as v;
+//    @use '../design-system/mixins'    as m;
+//
+//    ion-header { @include m.ion-toolbar-reset; }
+//
+//    .my-card {
+//      @include m.card;
+//      padding: v.$space-8;
+//    }
+//
+//    .my-btn { @include m.btn-primary; }
+//
+//    .my-badge { @include m.badge('warning'); }
+//
+//    .my-input { @include m.input-base; }
+//
+//    .bottom-nav { @include m.bottom-nav-base; }
+//
+//    .nav-item   { @include m.nav-item-base; }
+//    .nav-fab    { @include m.nav-fab-base;  }
+//
+//
+// 3. DARK MODE — manual toggle (from a settings page or service)
+// ──────────────────────────────────────────────────────────────
+//    // In your Angular service:
+//    setTheme(theme: 'light' | 'dark') {
+//      document.documentElement.setAttribute('data-theme', theme);
+//    }
+//
+//    // On app init, read from Capacitor Preferences:
+//    const { value } = await Preferences.get({ key: 'theme' });
+//    document.documentElement.setAttribute('data-theme', value ?? 'light');
+//
+//
+// 4. DARK MODE — follow system (automatic)
+// ────────────────────────────────────────
+//    The @media (prefers-color-scheme: dark) block in _tokens.scss
+//    handles this automatically — no JS needed.
+//    If you also set data-theme manually, the attribute takes priority
+//    over the media query (useful for user overrides).
+//
+//
+// 5. USING CSS CUSTOM PROPERTIES IN TYPESCRIPT (e.g. Chart.js colors)
+// ─────────────────────────────────────────────────────────────────────
+//    const style = getComputedStyle(document.documentElement);
+//    const accent = style.getPropertyValue('--color-accent').trim();
+//    // → '#4F46E5' in light mode, '#6360EA' in dark mode
+//
+//
+// ─── Token reference ──────────────────────────────────────────────────────────
+//
+//  COLORS
+//  --color-accent            Brand indigo
+//  --color-accent-hover      Darker on hover
+//  --color-accent-subtle     Very light indigo tint (bg)
+//  --color-accent-muted      Semi-transparent indigo (bg)
+//  --color-accent-border     Semi-transparent indigo (border)
+//
+//  --color-bg                Page background
+//  --color-surface           Card / sheet background
+//  --color-surface-raised    Elevated card background
+//  --color-surface-overlay   Backdrop behind bottom sheet
+//
+//  --color-border            Default 1px border
+//  --color-border-strong     Hover / emphasis border
+//  --color-border-focus      Input focus ring color
+//
+//  --color-text-primary      Headings, values
+//  --color-text-body         Descriptions, labels
+//  --color-text-muted        Placeholders, hints, uppercase labels
+//  --color-text-disabled     Disabled state text
+//  --color-text-inverse      Text on dark/accent backgrounds
+//
+//  --color-success / -bg / -border / -subtle
+//  --color-warning / -bg / -border / -subtle
+//  --color-danger  / -bg / -border / -subtle
+//  --color-notice  / -bg / -border            (orange — due today)
+//
+//  --color-income  / -accent / -bg / -border / -muted
+//  --color-expense / -accent / -bg / -border
+//
+//  --color-nav-bg / -border / -item / -active
+//  --color-fab-bg
+//
+// ─────────────────────────────────────────────────────────────────────────────

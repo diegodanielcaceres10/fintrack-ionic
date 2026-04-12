@@ -1,0 +1,73 @@
+@use "../../design-system/variables" as v;
+
+:host {
+  display: block;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: v.$space-4;
+  padding: v.$space-10 v.$page-padding-x v.$space-4;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: v.$radius-full;
+    flex-shrink: 0;
+    background: var(--color-text-muted);
+
+    &--success {
+      background: var(--color-success);
+    }
+    &--warning {
+      background: var(--color-warning);
+    }
+    &--danger {
+      background: var(--color-danger);
+    }
+    &--notice {
+      background: var(--color-notice);
+    }
+    &--accent {
+      background: var(--color-accent);
+    }
+    &--neutral {
+      background: var(--color-text-muted);
+    }
+  }
+
+  &__label {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: v.$letter-spacing-wider;
+    white-space: nowrap;
+  }
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  &__count {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  &__total {
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-expense);
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--pos {
+      color: var(--color-income);
+    }
+  }
+}

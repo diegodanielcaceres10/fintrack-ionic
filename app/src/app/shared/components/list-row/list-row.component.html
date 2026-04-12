@@ -1,0 +1,44 @@
+<div
+  class="list-row"
+  [class.list-row--muted]="muted"
+  [class.list-row--interactive]="interactive"
+  (click)="onClick()"
+  [attr.role]="interactive ? 'button' : null"
+  [attr.tabindex]="interactive ? 0 : null"
+>
+  <!-- Icon wrap -->
+  <div
+    *ngIf="icon"
+    class="list-row__icon"
+    [style.background]="iconBg || null"
+    aria-hidden="true"
+  >
+    {{ icon }}
+  </div>
+
+  <!-- Meta: name + sub -->
+  <div class="list-row__meta">
+    <p class="list-row__name">{{ name }}</p>
+    <p *ngIf="sub" class="list-row__sub">{{ sub }}</p>
+  </div>
+
+  <!-- Right slot: amount + any projected content (badge, button, etc.) -->
+  <div class="list-row__right">
+    <span
+      *ngIf="amount"
+      class="list-row__amount"
+      [class.list-row__amount--income]="amountVariant === 'income'"
+      [class.list-row__amount--expense]="amountVariant === 'expense'"
+      >{{ amount }}</span
+    >
+
+    <!--
+      Projected content slot — use for badges, action buttons, sync icons, etc.
+      Example:
+        <app-list-row name="Netflix" amount="-$15">
+          <app-badge variant="warning">3</app-badge>
+        </app-list-row>
+    -->
+    <ng-content></ng-content>
+  </div>
+</div>

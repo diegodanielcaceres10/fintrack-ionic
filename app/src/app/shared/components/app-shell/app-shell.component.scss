@@ -1,0 +1,174 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// app-shell.component.scss
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use "../../design-system/variables" as v;
+
+// The shell fills the full viewport — host must be a block
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// ─── ion-header / ion-toolbar ─────────────────────────────────────────────────
+
+ion-header {
+  ion-toolbar {
+    --background: var(--color-surface);
+    --border-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    padding: v.$space-8 v.$page-padding-x 0;
+  }
+}
+
+// ─── Toolbar main row ─────────────────────────────────────────────────────────
+
+.shell-toolbar {
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    margin-bottom: v.$space-4;
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: v.$space-6;
+  }
+
+  // Plain title
+  &__title {
+    font-size: v.$font-size-3xl; // 22px
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+    margin: 0;
+    line-height: v.$line-height-tight;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Greeting mode (dashboard)
+  &__greeting-sub {
+    font-size: v.$font-size-sm; // 11px
+    color: var(--color-text-muted);
+    font-weight: v.$font-weight-regular;
+    margin: 0;
+    line-height: 1;
+  }
+
+  &__greeting-name {
+    font-size: v.$font-size-2xl; // 19px
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+    margin: 0;
+    line-height: v.$line-height-tight;
+  }
+}
+
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+
+.shell-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.shell-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: v.$radius-full;
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-semibold;
+  color: var(--color-text-inverse);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.shell-notif-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: v.$radius-full;
+  background: var(--color-danger);
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1.5px solid var(--color-surface);
+}
+
+// ─── Action buttons ───────────────────────────────────────────────────────────
+
+// Ghost button — border + label + optional icon
+.shell-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  height: 34px;
+  padding: 0 v.$space-7;
+  border-radius: v.$radius-full;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  font-family: inherit;
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background v.$transition-fast;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--color-accent-muted);
+  }
+  &:active {
+    background: var(--color-accent-border);
+  }
+}
+
+// Square icon-only button
+.shell-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: v.$radius-sm;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-body);
+  padding: 0;
+  transition: background v.$transition-fast;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--color-bg);
+  }
+}

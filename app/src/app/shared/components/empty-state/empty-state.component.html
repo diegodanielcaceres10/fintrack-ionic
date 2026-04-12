@@ -1,0 +1,23 @@
+<div class="empty-state">
+  <span class="empty-state__icon" aria-hidden="true">{{ icon }}</span>
+
+  <p class="empty-state__title">{{ title }}</p>
+
+  <p *ngIf="subtitle" class="empty-state__subtitle">{{ subtitle }}</p>
+
+  <button
+    *ngIf="actionLabel"
+    class="empty-state__action add-btn"
+    (click)="actionClick.emit()"
+  >
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 5V19M5 12H19"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    </svg>
+    {{ actionLabel }}
+  </button>
+</div>

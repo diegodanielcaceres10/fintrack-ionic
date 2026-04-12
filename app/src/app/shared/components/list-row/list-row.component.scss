@@ -1,0 +1,85 @@
+@use "../../design-system/variables" as v;
+
+:host {
+  display: block;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: v.$space-6;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
+  padding: v.$space-6 v.$space-7;
+
+  &--muted {
+    opacity: 0.52;
+  }
+
+  &--interactive {
+    cursor: pointer;
+    transition: background v.$transition-fast;
+    &:hover {
+      background: var(--color-bg);
+    }
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: v.$radius-sm;
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-1;
+  }
+
+  &__name {
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sub {
+    font-size: v.$font-size-sm;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: v.$space-2;
+    flex-shrink: 0;
+  }
+
+  &__amount {
+    font-size: v.$font-size-md;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+
+    &--income {
+      color: var(--color-income);
+    }
+    &--expense {
+      color: var(--color-expense);
+    }
+  }
+}
