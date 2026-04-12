@@ -6,15 +6,18 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
 import { Chart, DoughnutController, ArcElement, Tooltip } from 'chart.js';
-import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
+
+import { AppShellComponent } from '../shared/components/app-shell/app-shell.component';
+import { ListRowComponent } from '../shared/components/list-row/list-row.component';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 interface Transaction {
   icon: string;
-  iconVariant: 'indigo' | 'green' | 'amber' | 'red';
+  iconBg: string;
   name: string;
   date: string;
   amount: number;
@@ -26,6 +29,8 @@ interface CategoryStat {
   percentage: number;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -33,17 +38,15 @@ interface CategoryStat {
   standalone: true,
   imports: [
     CommonModule,
-    IonContent,
-    IonHeader,
-    IonToolbar,
-    AddTransactionComponent,
+    AppShellComponent, // replaces IonHeader + IonToolbar + BottomNavComponent
+    ListRowComponent, // replaces .txn-item markup
   ],
 })
 export class HomePage implements OnInit, AfterViewInit {
   @ViewChild('donutCanvas', { static: false })
   donutCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('addSheet') addSheet!: AddTransactionComponent;
-  activeTab: 'home' | 'cards' | 'analytics' | 'profile' = 'home';
+
+  // ── Data ──────────────────────────────────────────────────────────────────
 
   balance = 12840;
   monthlySpend = 3240;
@@ -59,47 +62,49 @@ export class HomePage implements OnInit, AfterViewInit {
   transactions: Transaction[] = [
     {
       icon: '🏠',
-      iconVariant: 'indigo',
+      iconBg: '#EEF2FF',
       name: 'Rent payment',
       date: 'Apr 1, 2026',
       amount: -1130,
     },
     {
       icon: '🛒',
-      iconVariant: 'green',
+      iconBg: '#F0FDF4',
       name: 'Whole Foods Market',
       date: 'Apr 3, 2026',
       amount: -84,
     },
     {
       icon: '💰',
-      iconVariant: 'green',
+      iconBg: '#F0FDF4',
       name: 'Salary deposit',
       date: 'Apr 5, 2026',
       amount: 4500,
     },
     {
       icon: '🚇',
-      iconVariant: 'amber',
+      iconBg: '#FFFBEB',
       name: 'Metro card top-up',
       date: 'Apr 6, 2026',
       amount: -40,
     },
     {
       icon: '🎬',
-      iconVariant: 'red',
+      iconBg: '#FFF1F2',
       name: 'Netflix subscription',
       date: 'Apr 7, 2026',
       amount: -15,
     },
     {
       icon: '💊',
-      iconVariant: 'red',
+      iconBg: '#FFF1F2',
       name: 'CVS Pharmacy',
       date: 'Apr 9, 2026',
       amount: -32,
     },
   ];
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   ngOnInit(): void {}
 
@@ -135,9 +140,14 @@ export class HomePage implements OnInit, AfterViewInit {
     });
   }
 
-  setTab(tab: typeof this.activeTab): void {
-    this.activeTab = tab;
+  // ── Handlers ──────────────────────────────────────────────────────────────
+
+  onTransactionSaved(payload: unknown): void {
+    console.log('Transaction saved:', payload);
+    // TODO: push to your data service
   }
+
+  // ── Formatters ────────────────────────────────────────────────────────────
 
   formatAmount(amount: number): string {
     const abs = Math.abs(amount).toLocaleString('en-US');
@@ -148,12 +158,7 @@ export class HomePage implements OnInit, AfterViewInit {
     return `$${value.toLocaleString('en-US')}`;
   }
 
-  onSheetClosed(): void {
-    // Placeholder for any actions needed when the add transaction sheet is closed
-  }
-
-  onTransactionSaved(payload: any): void {
-    // Placeholder for handling the saved transaction data
-    console.log('Transaction saved:', payload);
+  amountVariant(amount: number): 'income' | 'expense' {
+    return amount > 0 ? 'income' : 'expense';
   }
 }

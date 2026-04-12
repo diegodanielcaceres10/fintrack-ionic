@@ -1,180 +1,94 @@
-// ─────────────────────────────────────────────
-// Design tokens
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// home.page.scss
+// Only styles specific to the home page — shell, nav, and shared components
+// are handled by their own stylesheets.
+// ─────────────────────────────────────────────────────────────────────────────
 
-$color-accent:       #4F46E5;
-$color-accent-light: #818CF8;
-$color-surface:      #ffffff;
-$color-bg:           #F8F8FC;
-$color-border:       #EEEDF8;
-$color-text-primary: #1A1837;
-$color-text-muted:   #9B99B8;
-$color-text-body:    #6B6A85;
-$color-green:        #22C55E;
-$color-red:          #EF4444;
+@use "../../design-system/variables" as v;
 
-$radius-sm:          12px;
-$radius-md:          14px;
-$radius-lg:          18px;
-$radius-full:        9999px;
-
-// ─────────────────────────────────────────────
-// ion-header / ion-toolbar
-// ─────────────────────────────────────────────
-
-ion-header {
-  ion-toolbar {
-    --background:    #{$color-surface};
-    --border-width:  0;
-    --padding-start: 0;
-    --padding-end:   0;
-    --padding-top:   0;
-    --padding-bottom: 0;
-    padding: 16px 20px 12px;
-  }
-}
-
-.header {
-  &__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  &__avatar-wrap {
-    position: relative;
-    display: inline-flex;
-  }
-}
-
-.greeting {
-  &__sub {
-    font-size: 12px;
-    color: $color-text-muted;
-    font-weight: 400;
-    margin-bottom: 2px;
-  }
-
-  &__name {
-    font-size: 19px;
-    font-weight: 600;
-    color: $color-text-primary;
-  }
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: $radius-full;
-  background: $color-accent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 15px;
-  color: $color-surface;
-  flex-shrink: 0;
-  user-select: none;
-}
-
-.notif-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: $radius-full;
-  background: $color-red;
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: 1.5px solid $color-surface;
-}
-
-// ─────────────────────────────────────────────
-// ion-content
-// ─────────────────────────────────────────────
-
-.dashboard-content {
-  --background: #{$color-bg};
-  --padding-bottom: 90px; // clears the fixed bottom nav
-}
-
-// ─────────────────────────────────────────────
-// Metric cards
-// ─────────────────────────────────────────────
+// ─── Metric cards ─────────────────────────────────────────────────────────────
 
 .metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 16px 20px 0;
+  gap: v.$space-6;
+  padding: v.$space-8 v.$page-padding-x 0;
 }
 
 .metric-card {
-  background: $color-surface;
-  border-radius: $radius-lg;
-  padding: 16px;
-  border: 1px solid $color-border;
+  background: var(--color-surface);
+  border-radius: v.$radius-lg;
+  padding: v.$space-8;
+  border: 1px solid var(--color-border);
 
   &--accent {
-    background: $color-accent;
-    border-color: $color-accent;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
 
-    .metric-card__label  { color: rgba(255, 255, 255, 0.65); }
-    .metric-card__value  { color: $color-surface; }
-    .metric-card__change { color: rgba(255, 255, 255, 0.75); }
+    .metric-card__label {
+      color: rgba(255, 255, 255, 0.65);
+    }
+    .metric-card__value {
+      color: #ffffff;
+    }
+    .metric-card__change {
+      color: rgba(255, 255, 255, 0.75);
+    }
   }
 
   &__label {
-    font-size: 11px;
-    font-weight: 500;
-    color: $color-text-muted;
+    font-size: v.$font-size-xs;
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    letter-spacing: v.$letter-spacing-wide;
+    margin: 0 0 v.$space-3;
   }
 
   &__value {
-    font-size: 22px;
-    font-weight: 600;
-    color: $color-text-primary;
+    font-size: v.$font-size-3xl;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
+    margin: 0;
   }
 
   &__change {
-    font-size: 11px;
-    margin-top: 5px;
-    font-weight: 500;
+    font-size: v.$font-size-xs;
+    font-weight: v.$font-weight-medium;
+    margin: v.$space-2 0 0;
 
-    &--up   { color: $color-green; }
-    &--down { color: $color-red; }
+    &--up {
+      color: var(--color-success);
+    }
+    &--down {
+      color: var(--color-danger);
+    }
   }
 }
 
-// ─────────────────────────────────────────────
-// Section title
-// ─────────────────────────────────────────────
+// ─── Section title ────────────────────────────────────────────────────────────
 
 .section-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: $color-text-primary;
-  padding: 20px 20px 12px;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-semibold;
+  color: var(--color-text-primary);
+  padding: v.$space-10 v.$page-padding-x v.$space-6;
   margin: 0;
 }
 
-// ─────────────────────────────────────────────
-// Donut chart card
-// ─────────────────────────────────────────────
+// ─── Donut chart card ─────────────────────────────────────────────────────────
 
 .chart-card {
-  background: $color-surface;
-  border-radius: $radius-lg;
-  margin: 0 20px;
-  border: 1px solid $color-border;
-  padding: 20px;
+  background: var(--color-surface);
+  border-radius: v.$radius-lg;
+  margin: 0 v.$page-padding-x;
+  border: 1px solid var(--color-border);
+  padding: v.$space-10;
 
   &__inner {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: v.$space-10;
   }
 }
 
@@ -195,25 +109,23 @@ ion-header {
   pointer-events: none;
 
   &__label {
-    font-size: 10px;
-    color: $color-text-muted;
+    font-size: v.$font-size-xs;
+    color: var(--color-text-muted);
   }
 
   &__value {
-    font-size: 16px;
-    font-weight: 600;
-    color: $color-text-primary;
+    font-size: v.$font-size-xl;
+    font-weight: v.$font-weight-semibold;
+    color: var(--color-text-primary);
   }
 }
 
-// ─────────────────────────────────────────────
-// Legend
-// ─────────────────────────────────────────────
+// ─── Legend ───────────────────────────────────────────────────────────────────
 
 .legend {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: v.$space-5;
   flex: 1;
   list-style: none;
   padding: 0;
@@ -222,7 +134,7 @@ ion-header {
   &__item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: v.$space-4;
   }
 
   &__dot {
@@ -233,177 +145,26 @@ ion-header {
   }
 
   &__name {
-    font-size: 12px;
-    color: $color-text-body;
+    font-size: v.$font-size-sm;
+    color: var(--color-text-body);
     flex: 1;
   }
 
   &__pct {
-    font-size: 12px;
-    font-weight: 500;
-    color: $color-text-primary;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-primary);
   }
 }
 
-// ─────────────────────────────────────────────
-// Transaction list
-// ─────────────────────────────────────────────
+// ─── Transaction list ─────────────────────────────────────────────────────────
+// .txn-list is just a spacing wrapper — the rows are handled by ListRowComponent
 
 .txn-list {
-  padding: 0 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0 v.$page-padding-x;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  list-style: none;
-  margin: 0;
-}
-
-.txn-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: $color-surface;
-  padding: 13px 14px;
-  border-radius: $radius-md;
-  border: 1px solid $color-border;
-
-  &__icon {
-    width: 38px;
-    height: 38px;
-    border-radius: $radius-sm;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
-
-    &--indigo { background: #EEF2FF; }
-    &--green  { background: #F0FDF4; }
-    &--amber  { background: #FFFBEB; }
-    &--red    { background: #FFF1F2; }
-  }
-
-  &__meta {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__name {
-    font-size: 13px;
-    font-weight: 500;
-    color: $color-text-primary;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
-  }
-
-  &__date {
-    font-size: 11px;
-    color: $color-text-muted;
-    margin: 2px 0 0;
-  }
-
-  &__amount {
-    font-size: 14px;
-    font-weight: 600;
-    flex-shrink: 0;
-
-    &--neg { color: $color-red; }
-    &--pos { color: $color-green; }
-  }
-}
-
-// ─────────────────────────────────────────────
-// Bottom spacer (inside ion-content)
-// ─────────────────────────────────────────────
-
-.bottom-spacer {
-  height: 16px;
-}
-
-// ─────────────────────────────────────────────
-// Bottom navigation (fixed, outside ion-content)
-// ─────────────────────────────────────────────
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: $color-surface;
-  border-top: 1px solid $color-border;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-
-  // Push it inside the ion-router-outlet on tablet/desktop if needed
-  @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
-  }
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 48px;
-  position: relative;
-  color: $color-text-muted;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  padding: 0;
-
-  &--active {
-    color: $color-accent;
-
-    .nav-item__label { color: $color-accent; }
-  }
-
-  &__icon {
-    width: 22px;
-    height: 22px;
-  }
-
-  &__label {
-    font-size: 10px;
-    color: inherit;
-    font-weight: 500;
-  }
-
-  &__dot {
-    width: 4px;
-    height: 4px;
-    border-radius: $radius-full;
-    background: $color-accent;
-    margin-top: -2px;
-  }
-}
-
-.nav-fab {
-  width: 52px;
-  height: 52px;
-  border-radius: $radius-full;
-  background: $color-accent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-top: -22px;
-  flex-shrink: 0;
-  border: none;
-  transition: opacity 0.15s ease;
-
-  svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  &:hover  { opacity: 0.9; }
-  &:active { opacity: 0.8; }
 }

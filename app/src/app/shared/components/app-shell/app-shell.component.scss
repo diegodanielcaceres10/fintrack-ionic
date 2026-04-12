@@ -1,8 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // app-shell.component.scss
 // ─────────────────────────────────────────────────────────────────────────────
-
-@use "../../design-system/variables" as v;
+@use "../../../../design-system/variables" as v;
 
 // The shell fills the full viewport — host must be a block
 :host {

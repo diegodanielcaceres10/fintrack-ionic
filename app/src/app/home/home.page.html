@@ -1,20 +1,5 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <div class="header__row">
-      <div class="header__greeting">
-        <p class="greeting__sub">Good morning</p>
-        <p class="greeting__name">Alex Johnson</p>
-      </div>
-      <div class="header__avatar-wrap">
-        <div class="avatar">AJ</div>
-        <span class="notif-dot"></span>
-      </div>
-    </div>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" class="dashboard-content">
-  <!-- Metric cards -->
+<app-shell greeting="Alex Johnson" avatarInitials="AJ" [hasNotification]="true">
+  <!-- ── Metric cards ──────────────────────────────────────────────────────── -->
   <section class="metrics">
     <div class="metric-card metric-card--accent">
       <p class="metric-card__label">Total balance</p>
@@ -23,6 +8,7 @@
         +2.4% this month
       </p>
     </div>
+
     <div class="metric-card">
       <p class="metric-card__label">Monthly spend</p>
       <p class="metric-card__value">{{ formatBalance(monthlySpend) }}</p>
@@ -30,8 +16,9 @@
     </div>
   </section>
 
-  <!-- Spending donut chart -->
+  <!-- ── Spending donut ────────────────────────────────────────────────────── -->
   <h2 class="section-title">Spending by category</h2>
+
   <div class="chart-card">
     <div class="chart-card__inner">
       <div class="donut-wrap">
@@ -40,7 +27,7 @@
           width="130"
           height="130"
           role="img"
-          aria-label="Donut chart: Housing 35%, Food 22%, Transport 18%, Entertainment 14%, Health 11%"
+          aria-label="Spending by category: Housing 35%, Food 22%, Transport 18%, Entertainment 14%, Health 11%"
         ></canvas>
         <div class="donut-center">
           <span class="donut-center__label">total</span>
@@ -49,6 +36,7 @@
           >
         </div>
       </div>
+
       <ul class="legend">
         <li class="legend__item" *ngFor="let cat of categories">
           <span class="legend__dot" [style.background]="cat.color"></span>
@@ -59,144 +47,19 @@
     </div>
   </div>
 
-  <!-- Recent transactions -->
+  <!-- ── Recent transactions ───────────────────────────────────────────────── -->
   <h2 class="section-title">Recent transactions</h2>
+
   <ul class="txn-list">
-    <li class="txn-item" *ngFor="let txn of transactions">
-      <div
-        class="txn-item__icon"
-        [ngClass]="'txn-item__icon--' + txn.iconVariant"
-      >
-        {{ txn.icon }}
-      </div>
-      <div class="txn-item__meta">
-        <p class="txn-item__name">{{ txn.name }}</p>
-        <p class="txn-item__date">{{ txn.date }}</p>
-      </div>
-      <span
-        class="txn-item__amount"
-        [ngClass]="txn.amount < 0 ? 'txn-item__amount--neg' : 'txn-item__amount--pos'"
-      >
-        {{ formatAmount(txn.amount) }}
-      </span>
+    <li *ngFor="let txn of transactions">
+      <app-list-row
+        [icon]="txn.icon"
+        [iconBg]="txn.iconBg"
+        [name]="txn.name"
+        [sub]="txn.date"
+        [amount]="formatAmount(txn.amount)"
+        [amountVariant]="amountVariant(txn.amount)"
+      />
     </li>
   </ul>
-
-  <!-- Bottom spacer so last item clears the nav bar -->
-  <div class="bottom-spacer"></div>
-</ion-content>
-
-<!-- Bottom navigation -->
-<div class="bottom-nav">
-  <button
-    class="nav-item"
-    [class.nav-item--active]="activeTab === 'home'"
-    (click)="setTab('home')"
-    aria-label="Home"
-  >
-    <svg
-      class="nav-item__icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z"
-        fill="currentColor"
-      />
-    </svg>
-    <span class="nav-item__label">Home</span>
-    <span class="nav-item__dot" *ngIf="activeTab === 'home'"></span>
-  </button>
-
-  <button
-    class="nav-item"
-    [class.nav-item--active]="activeTab === 'cards'"
-    (click)="setTab('cards')"
-    aria-label="Cards"
-  >
-    <svg
-      class="nav-item__icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect
-        x="3"
-        y="6"
-        width="18"
-        height="13"
-        rx="2"
-        stroke="currentColor"
-        stroke-width="1.5"
-      />
-      <path d="M3 10H21" stroke="currentColor" stroke-width="1.5" />
-      <circle cx="17" cy="15" r="1.5" fill="currentColor" />
-    </svg>
-    <span class="nav-item__label">Cards</span>
-    <span class="nav-item__dot" *ngIf="activeTab === 'cards'"></span>
-  </button>
-
-  <button class="nav-fab" aria-label="New transaction">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 5V19M5 12H19"
-        stroke="white"
-        stroke-width="2.2"
-        stroke-linecap="round"
-      />
-    </svg>
-  </button>
-
-  <button
-    class="nav-item"
-    [class.nav-item--active]="activeTab === 'analytics'"
-    (click)="setTab('analytics')"
-    aria-label="Analytics"
-  >
-    <svg
-      class="nav-item__icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M3 3H10V10H3V3ZM14 3H21V10H14V3ZM3 14H10V21H3V14ZM14 14H21V21H14V14Z"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <span class="nav-item__label">Analytics</span>
-    <span class="nav-item__dot" *ngIf="activeTab === 'analytics'"></span>
-  </button>
-
-  <button
-    class="nav-item"
-    [class.nav-item--active]="activeTab === 'profile'"
-    (click)="setTab('profile')"
-    aria-label="Profile"
-  >
-    <svg
-      class="nav-item__icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5" />
-      <path
-        d="M4 20C4 17 7.58 15 12 15C16.42 15 20 17 20 20"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-    </svg>
-    <span class="nav-item__label">Profile</span>
-    <span class="nav-item__dot" *ngIf="activeTab === 'profile'"></span>
-  </button>
-</div>
-<app-add-transaction
-  #addSheet
-  (saved)="onTransactionSaved($event)"
-  (closed)="onSheetClosed()"
-/>
+</app-shell>
