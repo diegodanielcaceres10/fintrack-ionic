@@ -1,10 +1,11 @@
 <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
   <!-- Home -->
-  <button
+  <a
     class="nav-item"
-    [class.nav-item--active]="isActive('home')"
-    (click)="onTabClick('home')"
-    [attr.aria-current]="isActive('home') ? 'page' : null"
+    routerLink="/home"
+    routerLinkActive="nav-item--active"
+    [attr.aria-current]="rlaHome.isActive ? 'page' : null"
+    #rlaHome="routerLinkActive"
     aria-label="Home"
   >
     <svg
@@ -19,20 +20,19 @@
       />
     </svg>
     <span class="nav-item__label">Home</span>
-    <span
-      class="nav-item__dot"
-      *ngIf="isActive('home')"
-      aria-hidden="true"
-    ></span>
-  </button>
+    @if (rlaHome.isActive) {
+      <span class="nav-item__dot" aria-hidden="true"></span>
+    }
+  </a>
 
-  <!-- Cards -->
-  <button
+  <!-- Transactions -->
+  <a
     class="nav-item"
-    [class.nav-item--active]="isActive('cards')"
-    (click)="onTabClick('cards')"
-    [attr.aria-current]="isActive('cards') ? 'page' : null"
-    aria-label="Cards"
+    routerLink="/transactions"
+    routerLinkActive="nav-item--active"
+    [attr.aria-current]="rlaTxn.isActive ? 'page' : null"
+    #rlaTxn="routerLinkActive"
+    aria-label="Transactions"
   >
     <svg
       class="nav-item__icon"
@@ -52,19 +52,18 @@
       <path d="M3 10H21" stroke="currentColor" stroke-width="1.5" />
       <circle cx="17" cy="15" r="1.5" fill="currentColor" />
     </svg>
-    <span class="nav-item__label">Cards</span>
-    <span
-      class="nav-item__dot"
-      *ngIf="isActive('cards')"
-      aria-hidden="true"
-    ></span>
-  </button>
+    <span class="nav-item__label">Transactions</span>
+    @if (rlaTxn.isActive) {
+      <span class="nav-item__dot" aria-hidden="true"></span>
+    }
+  </a>
 
-  <!-- FAB -->
+  <!-- FAB — no route, emits fabTap to parent -->
   <button
     class="nav-fab"
     (click)="onFabClick()"
     aria-label="Add new transaction"
+    type="button"
   >
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -76,13 +75,14 @@
     </svg>
   </button>
 
-  <!-- Analytics -->
-  <button
+  <!-- Budget -->
+  <a
     class="nav-item"
-    [class.nav-item--active]="isActive('analytics')"
-    (click)="onTabClick('analytics')"
-    [attr.aria-current]="isActive('analytics') ? 'page' : null"
-    aria-label="Analytics"
+    routerLink="/budget"
+    routerLinkActive="nav-item--active"
+    [attr.aria-current]="rlaBudget.isActive ? 'page' : null"
+    #rlaBudget="routerLinkActive"
+    aria-label="Budget"
   >
     <svg
       class="nav-item__icon"
@@ -97,21 +97,20 @@
         stroke-linejoin="round"
       />
     </svg>
-    <span class="nav-item__label">Analytics</span>
-    <span
-      class="nav-item__dot"
-      *ngIf="isActive('analytics')"
-      aria-hidden="true"
-    ></span>
-  </button>
+    <span class="nav-item__label">Budget</span>
+    @if (rlaBudget.isActive) {
+      <span class="nav-item__dot" aria-hidden="true"></span>
+    }
+  </a>
 
-  <!-- Profile -->
-  <button
+  <!-- Settings -->
+  <a
     class="nav-item"
-    [class.nav-item--active]="isActive('profile')"
-    (click)="onTabClick('profile')"
-    [attr.aria-current]="isActive('profile') ? 'page' : null"
-    aria-label="Profile"
+    routerLink="/settings"
+    routerLinkActive="nav-item--active"
+    [attr.aria-current]="rlaSettings.isActive ? 'page' : null"
+    #rlaSettings="routerLinkActive"
+    aria-label="Settings"
   >
     <svg
       class="nav-item__icon"
@@ -127,11 +126,9 @@
         stroke-linecap="round"
       />
     </svg>
-    <span class="nav-item__label">Profile</span>
-    <span
-      class="nav-item__dot"
-      *ngIf="isActive('profile')"
-      aria-hidden="true"
-    ></span>
-  </button>
+    <span class="nav-item__label">Settings</span>
+    @if (rlaSettings.isActive) {
+      <span class="nav-item__dot" aria-hidden="true"></span>
+    }
+  </a>
 </nav>

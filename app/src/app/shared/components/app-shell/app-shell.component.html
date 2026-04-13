@@ -100,11 +100,7 @@
 </ion-content>
 
 <!-- ─── Bottom navigation ────────────────────────────────────────────────────── -->
-<app-bottom-nav
-  [activeTab]="activeTab"
-  (tabChange)="onTabChange($event)"
-  (fabTap)="openAddSheet()"
-/>
+<app-bottom-nav (fabTap)="openAddSheet()" />
 
 <!-- ─── Add transaction sheet ────────────────────────────────────────────────── -->
 <app-add-transaction *ngIf="showAddSheet" (closed)="closeAddSheet()" />

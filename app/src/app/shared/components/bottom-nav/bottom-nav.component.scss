@@ -1,13 +1,7 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// bottom-nav.component.scss
-// All values reference CSS custom properties from the design system.
-// No hardcoded colors or sizes — dark mode works automatically.
-// ─────────────────────────────────────────────────────────────────────────────
-
 @use "../../../../design-system/variables" as v;
 
 :host {
-  display: block; // ensures the component doesn't collapse
+  display: block;
 }
 
 .bottom-nav {
@@ -21,31 +15,30 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-
-  // Base padding + safe area inset for iPhone home indicator
   padding: v.$space-5 v.$space-4
     calc(#{v.$space-5} + env(safe-area-inset-bottom));
 }
 
-// ─── Nav item ─────────────────────────────────────────────────────────────────
+// ─── Nav item — now an <a> tag ────────────────────────────────────────────────
 
 .nav-item {
+  // Reset <a> defaults
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: v.$space-1;
-  min-width: 48px; // minimum touch target width
+  min-width: 48px;
   position: relative;
   color: var(--color-nav-item);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
   padding: 0;
   transition: color v.$transition-fast;
 
-  // Active state — driven by [class.nav-item--active] binding
-  &--active {
+  // RouterLinkActive applies this class automatically
+  &--active,
+  &.nav-item--active {
     color: var(--color-nav-active);
 
     .nav-item__label {
@@ -60,13 +53,12 @@
   }
 
   &__label {
-    font-size: v.$font-size-xs; // 10px
+    font-size: v.$font-size-xs;
     font-weight: v.$font-weight-medium;
     color: inherit;
     line-height: 1;
   }
 
-  // Active indicator dot below label
   &__dot {
     width: 4px;
     height: 4px;
@@ -79,7 +71,7 @@
 // ─── FAB ──────────────────────────────────────────────────────────────────────
 
 .nav-fab {
-  width: v.$fab-size; // 52px
+  width: v.$fab-size;
   height: v.$fab-size;
   border-radius: v.$radius-full;
   background: var(--color-fab-bg);
@@ -87,7 +79,6 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  // Lifts the FAB above the nav bar
   margin-top: calc(-#{v.$fab-size} * 0.42);
   flex-shrink: 0;
   border: none;
