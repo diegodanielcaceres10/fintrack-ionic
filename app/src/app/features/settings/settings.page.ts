@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+
+import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
+import { BadgeComponent } from '../../shared/components/badge/badge.component';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -13,19 +15,20 @@ interface SyncOption {
   subtitle: string;
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonHeader, IonToolbar],
+  imports: [
+    CommonModule,
+    AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav
+    BadgeComponent, // pending count + synced checkmark badges
+  ],
 })
 export class SettingsPage implements OnInit {
-  // ── Nav ────────────────────────────────────────────────────────────────────
-  activeTab: 'home' | 'cards' | 'analytics' | 'profile' = 'profile';
-
   // ── Sync mode ──────────────────────────────────────────────────────────────
   selectedSyncMode: SyncMode = 'daily';
 
@@ -73,12 +76,10 @@ export class SettingsPage implements OnInit {
     if (this.syncState === 'syncing') return;
     this.syncState = 'syncing';
 
-    // Simulate async sync
     setTimeout(() => {
       this.syncState = 'success';
       this.lastSyncedAt = new Date();
       this.pendingRecords = 0;
-
       setTimeout(() => {
         this.syncState = 'idle';
       }, 2500);
@@ -98,17 +99,25 @@ export class SettingsPage implements OnInit {
     }
   }
 
+  get syncBtnVariant(): string {
+    switch (this.syncState) {
+      case 'syncing':
+        return 'btn-primary--syncing';
+      case 'success':
+        return 'btn-primary--success';
+      case 'error':
+        return 'btn-primary--danger';
+      default:
+        return '';
+    }
+  }
+
   // ── Account ────────────────────────────────────────────────────────────────
   readonly userEmail = 'alex.johnson@email.com';
 
   logout(): void {
-    // Hook up to your auth service
+    // TODO: connect to auth service
     console.log('logout');
-  }
-
-  // ── Nav ────────────────────────────────────────────────────────────────────
-  setTab(t: typeof this.activeTab): void {
-    this.activeTab = t;
   }
 
   ngOnInit(): void {}
