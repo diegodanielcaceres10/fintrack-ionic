@@ -1,0 +1,131 @@
+<app-shell title="Budget" [action]="addAction">
+  <!-- ── Subheader: month navigator ─────────────────────────────────────── -->
+  <ng-template #subheader>
+    <div class="month-nav" role="group" aria-label="Month navigation">
+      <button
+        class="month-nav__arrow"
+        (click)="prevMonth()"
+        aria-label="Previous month"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M15 18l-6-6 6-6"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <span class="month-nav__label">{{ monthLabel }}</span>
+
+      <button
+        class="month-nav__arrow"
+        [class.month-nav__arrow--disabled]="isCurrentMonth"
+        [disabled]="isCurrentMonth"
+        (click)="nextMonth()"
+        aria-label="Next month"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M9 18l6-6-6-6"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- ── Summary card ──────────────────────────────────────────────────────── -->
+  <div class="summary-card">
+    <div class="summary-card__row">
+      <div class="summary-card__block">
+        <p class="summary-card__label">Total spent</p>
+        <p class="summary-card__value">{{ formatMoney(totalSpent) }}</p>
+      </div>
+      <div class="summary-card__divider"></div>
+      <div class="summary-card__block">
+        <p class="summary-card__label">Budget limit</p>
+        <p class="summary-card__value">{{ formatMoney(totalLimit) }}</p>
+      </div>
+      <div class="summary-card__divider"></div>
+      <div class="summary-card__block">
+        <p class="summary-card__label">Remaining</p>
+        <p
+          class="summary-card__value"
+          [class]="'summary-card__value--' + totalLevel"
+        >
+          {{ formatMoney(remaining) }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Overall progress bar — uses design system .progress classes -->
+    <div class="progress__track progress__track--thick">
+      <div
+        class="progress__fill"
+        [class]="'progress__fill--' + totalProgressVariant"
+        [style.width.%]="totalPct"
+        role="progressbar"
+        [attr.aria-valuenow]="totalPct"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-label]="'Overall budget ' + totalPct + '% used'"
+      ></div>
+    </div>
+
+    <p
+      class="summary-card__pct-label"
+      [class]="'summary-card__pct-label--' + totalLevel"
+    >
+      {{ totalPct }}% of total budget used
+    </p>
+  </div>
+
+  <!-- ── Category list ─────────────────────────────────────────────────────── -->
+  <ul class="budget-list">
+    <li class="budget-item" *ngFor="let cat of categories; trackBy: trackById">
+      <div class="budget-item__icon">{{ cat.icon }}</div>
+
+      <div class="budget-item__body">
+        <!-- Name + percentage -->
+        <div class="budget-item__top-row">
+          <span class="budget-item__name">{{ cat.name }}</span>
+          <span
+            class="budget-item__pct"
+            [class]="'budget-item__pct--' + level(cat)"
+            >{{ pct(cat) }}%</span
+          >
+        </div>
+
+        <!-- Progress bar — uses design system .progress classes -->
+        <div class="progress__track">
+          <div
+            class="progress__fill"
+            [class]="'progress__fill--' + progressVariant(cat)"
+            [style.width.%]="pct(cat)"
+            role="progressbar"
+            [attr.aria-valuenow]="pct(cat)"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-label]="cat.name + ' ' + pct(cat) + '% used'"
+          ></div>
+        </div>
+
+        <!-- Spent / limit -->
+        <div class="budget-item__amounts">
+          <span class="budget-item__spent"
+            >{{ formatMoney(cat.spent) }} spent</span
+          >
+          <span class="budget-item__limit"
+            >of {{ formatMoney(cat.limit) }}</span
+          >
+        </div>
+      </div>
+    </li>
+  </ul>
+</app-shell>

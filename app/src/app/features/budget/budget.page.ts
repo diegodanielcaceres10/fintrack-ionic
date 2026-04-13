@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+
+import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -14,18 +15,25 @@ export interface BudgetCategory {
 
 export type UsageLevel = 'safe' | 'warning' | 'danger';
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.page.html',
   styleUrls: ['./budget.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonHeader, IonToolbar],
+  imports: [
+    CommonModule,
+    AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav
+  ],
 })
 export class BudgetPage implements OnInit {
-  // ── Nav state ──────────────────────────────────────────────────────────────
-  activeTab: 'home' | 'cards' | 'analytics' | 'profile' = 'analytics';
+  // ── Shell action ───────────────────────────────────────────────────────────
+  readonly addAction = {
+    label: 'Add budget',
+    icon: 'M12 5V19M5 12H19',
+    variant: 'ghost' as const,
+  };
 
   // ── Month navigation ───────────────────────────────────────────────────────
   private readonly today = new Date();
@@ -62,7 +70,7 @@ export class BudgetPage implements OnInit {
     );
   }
 
-  // ── Mock budget data ───────────────────────────────────────────────────────
+  // ── Mock data ──────────────────────────────────────────────────────────────
   readonly categories: BudgetCategory[] = [
     { id: 'housing', icon: '🏠', name: 'Housing', spent: 1130, limit: 1200 },
     { id: 'food', icon: '🛒', name: 'Food', spent: 480, limit: 600 },
@@ -94,11 +102,17 @@ export class BudgetPage implements OnInit {
     return 'safe';
   }
 
+  // Maps UsageLevel → progress bar CSS modifier
+  progressVariant(cat: BudgetCategory): 'success' | 'warning' | 'danger' {
+    const l = this.level(cat);
+    return l === 'safe' ? 'success' : l;
+  }
+
   formatMoney(value: number): string {
     return `$${value.toLocaleString('en-US')}`;
   }
 
-  // ── Summary ────────────────────────────────────────────────────────────────
+  // ── Summary getters ────────────────────────────────────────────────────────
   get totalSpent(): number {
     return this.categories.reduce((s, c) => s + c.spent, 0);
   }
@@ -107,6 +121,9 @@ export class BudgetPage implements OnInit {
   }
   get totalPct(): number {
     return Math.min(Math.round((this.totalSpent / this.totalLimit) * 100), 100);
+  }
+  get remaining(): number {
+    return this.totalLimit - this.totalSpent;
   }
   get totalLevel(): UsageLevel {
     return this.level({
@@ -117,13 +134,12 @@ export class BudgetPage implements OnInit {
       limit: this.totalLimit,
     });
   }
-  get remaining(): number {
-    return this.totalLimit - this.totalSpent;
+  get totalProgressVariant(): 'success' | 'warning' | 'danger' {
+    return this.totalLevel === 'safe' ? 'success' : this.totalLevel;
   }
 
-  // ── Nav ────────────────────────────────────────────────────────────────────
-  setTab(t: typeof this.activeTab): void {
-    this.activeTab = t;
+  trackById(_: number, cat: BudgetCategory): string {
+    return cat.id;
   }
 
   ngOnInit(): void {}
