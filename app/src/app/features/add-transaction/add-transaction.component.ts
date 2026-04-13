@@ -7,8 +7,8 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ const OVERLAY_ANIMATION = trigger('overlay', [
   templateUrl: 'add-transaction.component.html',
   styleUrls: ['add-transaction.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, DecimalPipe], // CommonModule removed — using @if / @for
   animations: [SHEET_ANIMATION, OVERLAY_ANIMATION],
 })
 export class AddTransactionComponent implements OnInit {
@@ -85,21 +85,14 @@ export class AddTransactionComponent implements OnInit {
 
   // ── Form state ─────────────────────────────────────────────────────────────
   type: TxnType = 'expense';
-
-  /** Raw string kept in sync with the input — allows "0.5", "12." etc. mid-type */
   amountRaw = '';
-
-  get amountDisplay(): string {
-    return this.amountRaw || '0';
-  }
+  selectedCategoryId = 'food';
+  note = '';
+  date = new Date().toISOString().split('T')[0];
 
   get amountValue(): number {
     return parseFloat(this.amountRaw) || 0;
   }
-
-  selectedCategoryId = 'food';
-  note = '';
-  date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
   // ── Categories ─────────────────────────────────────────────────────────────
   readonly expenseCategories: TransactionCategory[] = [
@@ -128,13 +121,8 @@ export class AddTransactionComponent implements OnInit {
       : this.incomeCategories;
   }
 
-  get selectedCategory(): TransactionCategory | undefined {
-    return this.categories.find((c) => c.id === this.selectedCategoryId);
-  }
-
   setType(t: TxnType): void {
     this.type = t;
-    // Reset to first category of the new type
     this.selectedCategoryId = this.categories[0].id;
   }
 
@@ -145,7 +133,6 @@ export class AddTransactionComponent implements OnInit {
   // ── Amount input ───────────────────────────────────────────────────────────
   onAmountInput(event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
-    // Allow digits and one decimal point, max 2 decimals
     const cleaned = raw
       .replace(/[^0-9.]/g, '')
       .replace(/^(\d*\.?\d{0,2}).*$/, '$1');
@@ -153,7 +140,7 @@ export class AddTransactionComponent implements OnInit {
     (event.target as HTMLInputElement).value = cleaned;
   }
 
-  // ── Keyboard: close on Escape ──────────────────────────────────────────────
+  // ── Keyboard ──────────────────────────────────────────────────────────────
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.visible) this.close();
@@ -173,7 +160,7 @@ export class AddTransactionComponent implements OnInit {
   onDragMove(event: TouchEvent | MouseEvent): void {
     if (!this.isDragging) return;
     const delta = this.clientY(event) - this.dragStartY;
-    if (delta < 0) return; // don't allow dragging up
+    if (delta < 0) return;
     this.dragCurrent = delta;
     if (this.sheetRef) {
       this.sheetRef.nativeElement.style.transform = `translateY(${delta}px)`;
@@ -213,7 +200,6 @@ export class AddTransactionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Auto-open when component is mounted
     setTimeout(() => this.open(), 10);
   }
 }

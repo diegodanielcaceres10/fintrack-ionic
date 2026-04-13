@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { IonHeader, IonToolbar, IonContent } from '@ionic/angular/standalone';
 
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
-import { AddTransactionComponent } from '../../../add-transaction/add-transaction.component';
+import { AddTransactionComponent } from '../../../features/add-transaction/add-transaction.component';
 
 export interface ShellAction {
   label: string;
