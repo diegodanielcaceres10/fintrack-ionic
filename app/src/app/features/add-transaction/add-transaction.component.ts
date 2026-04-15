@@ -11,25 +11,17 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+import {
+  CreateTransactionInput,
+  TransactionCategory,
+  TransactionType,
+} from '../../shared/models/transaction.model';
 
-export type TxnType = 'expense' | 'income';
-
-export interface TransactionCategory {
-  id: string;
+interface CategoryOption {
+  id: TransactionCategory;
   icon: string;
   label: string;
 }
-
-export interface AddTransactionPayload {
-  type: TxnType;
-  amount: number;
-  categoryId: string;
-  note: string;
-  date: string;
-}
-
-// ─── Animations ──────────────────────────────────────────────────────────────
 
 const SHEET_ANIMATION = trigger('sheet', [
   transition(':enter', [
@@ -55,47 +47,29 @@ const OVERLAY_ANIMATION = trigger('overlay', [
   transition(':leave', [animate('220ms ease', style({ opacity: 0 }))]),
 ]);
 
-// ─── Component ───────────────────────────────────────────────────────────────
-
 @Component({
   selector: 'app-add-transaction',
   templateUrl: 'add-transaction.component.html',
   styleUrls: ['add-transaction.component.scss'],
   standalone: true,
-  imports: [FormsModule, DecimalPipe], // CommonModule removed — using @if / @for
+  imports: [FormsModule, DecimalPipe],
   animations: [SHEET_ANIMATION, OVERLAY_ANIMATION],
 })
 export class AddTransactionComponent implements OnInit {
   @Output() closed = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<AddTransactionPayload>();
+  @Output() saved = new EventEmitter<CreateTransactionInput>();
 
   @ViewChild('amountInput') amountInputRef!: ElementRef<HTMLInputElement>;
   @ViewChild('sheet') sheetRef!: ElementRef<HTMLElement>;
 
-  // ── Visibility ─────────────────────────────────────────────────────────────
   visible = true;
-
-  open(): void {
-    this.visible = true;
-  }
-  close(): void {
-    this.visible = false;
-    setTimeout(() => this.closed.emit(), 280);
-  }
-
-  // ── Form state ─────────────────────────────────────────────────────────────
-  type: TxnType = 'expense';
+  type: TransactionType = 'expense';
   amountRaw = '';
-  selectedCategoryId = 'food';
+  selectedCategoryId: TransactionCategory = 'food';
   note = '';
   date = new Date().toISOString().split('T')[0];
 
-  get amountValue(): number {
-    return parseFloat(this.amountRaw) || 0;
-  }
-
-  // ── Categories ─────────────────────────────────────────────────────────────
-  readonly expenseCategories: TransactionCategory[] = [
+  readonly expenseCategories: CategoryOption[] = [
     { id: 'food', icon: '🛒', label: 'Food' },
     { id: 'housing', icon: '🏠', label: 'Housing' },
     { id: 'transport', icon: '🚇', label: 'Transport' },
@@ -107,7 +81,7 @@ export class AddTransactionComponent implements OnInit {
     { id: 'other', icon: '📦', label: 'Other' },
   ];
 
-  readonly incomeCategories: TransactionCategory[] = [
+  readonly incomeCategories: CategoryOption[] = [
     { id: 'salary', icon: '💰', label: 'Salary' },
     { id: 'freelance', icon: '💻', label: 'Freelance' },
     { id: 'gift', icon: '🎁', label: 'Gift' },
@@ -115,22 +89,42 @@ export class AddTransactionComponent implements OnInit {
     { id: 'other', icon: '📦', label: 'Other' },
   ];
 
-  get categories(): TransactionCategory[] {
+  private dragStartY = 0;
+  private dragCurrent = 0;
+  private isDragging = false;
+
+  get amountValue(): number {
+    return parseFloat(this.amountRaw) || 0;
+  }
+
+  get categories(): CategoryOption[] {
     return this.type === 'expense'
       ? this.expenseCategories
       : this.incomeCategories;
   }
 
-  setType(t: TxnType): void {
-    this.type = t;
+  get isValid(): boolean {
+    return this.amountValue > 0 && !!this.selectedCategoryId;
+  }
+
+  open(): void {
+    this.visible = true;
+  }
+
+  close(): void {
+    this.visible = false;
+    setTimeout(() => this.closed.emit(), 280);
+  }
+
+  setType(type: TransactionType): void {
+    this.type = type;
     this.selectedCategoryId = this.categories[0].id;
   }
 
-  selectCategory(id: string): void {
+  selectCategory(id: TransactionCategory): void {
     this.selectedCategoryId = id;
   }
 
-  // ── Amount input ───────────────────────────────────────────────────────────
   onAmountInput(event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
     const cleaned = raw
@@ -140,16 +134,10 @@ export class AddTransactionComponent implements OnInit {
     (event.target as HTMLInputElement).value = cleaned;
   }
 
-  // ── Keyboard ──────────────────────────────────────────────────────────────
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.visible) this.close();
   }
-
-  // ── Drag-to-dismiss ────────────────────────────────────────────────────────
-  private dragStartY = 0;
-  private dragCurrent = 0;
-  private isDragging = false;
 
   onDragStart(event: TouchEvent | MouseEvent): void {
     this.isDragging = true;
@@ -178,17 +166,9 @@ export class AddTransactionComponent implements OnInit {
     if (this.dragCurrent > 100) this.close();
   }
 
-  private clientY(e: TouchEvent | MouseEvent): number {
-    return e instanceof TouchEvent ? (e.touches[0]?.clientY ?? 0) : e.clientY;
-  }
-
-  // ── Submit ─────────────────────────────────────────────────────────────────
-  get isValid(): boolean {
-    return this.amountValue > 0 && !!this.selectedCategoryId;
-  }
-
   submit(): void {
     if (!this.isValid) return;
+
     this.saved.emit({
       type: this.type,
       amount: this.amountValue,
@@ -196,8 +176,13 @@ export class AddTransactionComponent implements OnInit {
       note: this.note.trim(),
       date: this.date,
     });
-    this.close();
   }
 
   ngOnInit(): void {}
+
+  private clientY(event: TouchEvent | MouseEvent): number {
+    return event instanceof TouchEvent
+      ? (event.touches[0]?.clientY ?? 0)
+      : event.clientY;
+  }
 }

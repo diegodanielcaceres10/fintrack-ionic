@@ -17,6 +17,8 @@ import {
 
 import { AddTransactionComponent } from '../../../features/add-transaction/add-transaction.component';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
+import { CreateTransactionInput } from '../../models/transaction.model';
+import { TransactionStorageService } from '../../services/transaction-storage.service';
 
 export interface ShellAction {
   label: string;
@@ -41,6 +43,10 @@ export interface ShellAction {
   ],
 })
 export class AppShellComponent {
+  constructor(
+    private readonly transactionStorage: TransactionStorageService,
+  ) {}
+
   @Input() title = '';
   @Input() greeting?: string;
   @Input() showAvatar = false;
@@ -62,6 +68,11 @@ export class AppShellComponent {
 
   closeAddSheet(): void {
     this.showAddSheet = false;
+  }
+
+  onTransactionSaved(payload: CreateTransactionInput): void {
+    this.transactionStorage.addTransaction(payload);
+    this.closeAddSheet();
   }
 
   get greetingPrefix(): string {

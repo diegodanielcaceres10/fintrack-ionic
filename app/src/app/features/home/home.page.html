@@ -53,10 +53,10 @@
   <ul class="txn-list">
     <li *ngFor="let txn of transactions">
       <app-list-row
-        [icon]="txn.icon"
-        [iconBg]="txn.iconBg"
+        [icon]="iconFor(txn)"
+        [iconBg]="iconBgFor(txn)"
         [name]="txn.name"
-        [sub]="txn.date"
+        [sub]="formattedDate(txn)"
         [amount]="formatAmount(txn.amount)"
         [amountVariant]="amountVariant(txn.amount)"
       />

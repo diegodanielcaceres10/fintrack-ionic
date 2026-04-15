@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Transaction } from './transactions.page';
+import { Transaction } from '../../shared/models/transaction.model';
 
 /**
  * Sums the amounts of a transaction group.

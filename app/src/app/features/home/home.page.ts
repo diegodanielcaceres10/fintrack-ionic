@@ -1,35 +1,29 @@
 import {
-  Component,
-  OnInit,
   AfterViewInit,
+  Component,
   ElementRef,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Chart, DoughnutController, ArcElement, Tooltip } from 'chart.js';
+import { Subscription } from 'rxjs';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
+import {
+  Transaction,
+  TRANSACTION_CATEGORIES,
+} from '../../shared/models/transaction.model';
+import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Transaction {
-  icon: string;
-  iconBg: string;
-  name: string;
-  date: string;
-  amount: number;
-}
 
 interface CategoryStat {
   name: string;
   color: string;
   percentage: number;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-home',
@@ -39,17 +33,17 @@ interface CategoryStat {
   host: {
     class: 'ion-page',
   },
-  imports: [
-    CommonModule,
-    AppShellComponent, // replaces IonHeader + IonToolbar + BottomNavComponent
-    ListRowComponent, // replaces .txn-item markup
-  ],
+  imports: [CommonModule, AppShellComponent, ListRowComponent],
 })
 export class HomePage implements OnInit, AfterViewInit {
   @ViewChild('donutCanvas', { static: false })
   donutCanvas!: ElementRef<HTMLCanvasElement>;
 
-  // ── Data ──────────────────────────────────────────────────────────────────
+  private transactionsSubscription?: Subscription;
+
+  constructor(
+    private readonly transactionStorage: TransactionStorageService,
+  ) {}
 
   balance = 12840;
   monthlySpend = 3240;
@@ -62,54 +56,33 @@ export class HomePage implements OnInit, AfterViewInit {
     { name: 'Health', color: '#F87171', percentage: 11 },
   ];
 
-  transactions: Transaction[] = [
-    {
-      icon: '🏠',
-      iconBg: '#EEF2FF',
-      name: 'Rent payment',
-      date: 'Apr 1, 2026',
-      amount: -1130,
-    },
-    {
-      icon: '🛒',
-      iconBg: '#F0FDF4',
-      name: 'Whole Foods Market',
-      date: 'Apr 3, 2026',
-      amount: -84,
-    },
-    {
-      icon: '💰',
-      iconBg: '#F0FDF4',
-      name: 'Salary deposit',
-      date: 'Apr 5, 2026',
-      amount: 4500,
-    },
-    {
-      icon: '🚇',
-      iconBg: '#FFFBEB',
-      name: 'Metro card top-up',
-      date: 'Apr 6, 2026',
-      amount: -40,
-    },
-    {
-      icon: '🎬',
-      iconBg: '#FFF1F2',
-      name: 'Netflix subscription',
-      date: 'Apr 7, 2026',
-      amount: -15,
-    },
-    {
-      icon: '💊',
-      iconBg: '#FFF1F2',
-      name: 'CVS Pharmacy',
-      date: 'Apr 9, 2026',
-      amount: -32,
-    },
-  ];
+  transactions: Transaction[] = [];
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+      (transactions) => {
+        this.transactions = [...transactions]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .slice(0, 6);
 
-  ngOnInit(): void {}
+        const monthlyTransactions = transactions.filter((txn) => {
+          const date = new Date(txn.date);
+          return (
+            date.getFullYear() === 2026 &&
+            date.getMonth() === 3 &&
+            txn.type === 'expense'
+          );
+        });
+
+        this.monthlySpend = Math.abs(
+          monthlyTransactions.reduce((sum, txn) => sum + txn.amount, 0),
+        );
+
+        const netBalance = transactions.reduce((sum, txn) => sum + txn.amount, 0);
+        this.balance = 12840 + netBalance;
+      },
+    );
+  }
 
   ngAfterViewInit(): void {
     this.initDonutChart();
@@ -143,15 +116,6 @@ export class HomePage implements OnInit, AfterViewInit {
     });
   }
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-
-  onTransactionSaved(payload: unknown): void {
-    console.log('Transaction saved:', payload);
-    // TODO: push to your data service
-  }
-
-  // ── Formatters ────────────────────────────────────────────────────────────
-
   formatAmount(amount: number): string {
     const abs = Math.abs(amount).toLocaleString('en-US');
     return amount < 0 ? `-$${abs}` : `+$${abs}`;
@@ -163,5 +127,21 @@ export class HomePage implements OnInit, AfterViewInit {
 
   amountVariant(amount: number): 'income' | 'expense' {
     return amount > 0 ? 'income' : 'expense';
+  }
+
+  iconFor(txn: Transaction): string {
+    return TRANSACTION_CATEGORIES[txn.category].icon;
+  }
+
+  iconBgFor(txn: Transaction): string {
+    return TRANSACTION_CATEGORIES[txn.category].bg;
+  }
+
+  formattedDate(txn: Transaction): string {
+    return new Date(txn.date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   }
 }
