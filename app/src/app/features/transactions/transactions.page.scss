@@ -167,3 +167,14 @@
   font-weight: v.$font-weight-medium;
   width: fit-content;
 }
+
+.txn-delete-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-expense);
+  font: inherit;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-semibold;
+  cursor: pointer;
+  padding: 0;
+}

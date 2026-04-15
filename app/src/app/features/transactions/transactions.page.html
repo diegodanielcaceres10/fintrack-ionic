@@ -129,6 +129,15 @@
             [check]="txn.syncStatus === 'synced'"
             size="sm"
           />
+
+          <button
+            class="txn-delete-btn"
+            type="button"
+            (click)="deleteTransaction(txn.id)"
+            aria-label="Delete transaction"
+          >
+            Delete
+          </button>
         </app-list-row>
       </li>
     </ul>

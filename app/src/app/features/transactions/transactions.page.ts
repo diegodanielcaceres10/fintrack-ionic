@@ -13,8 +13,6 @@ import {
   SyncStatus,
   Transaction,
   TRANSACTION_CATEGORIES,
-  TransactionCategory,
-  TransactionType,
 } from '../../shared/models/transaction.model';
 import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
@@ -157,6 +155,10 @@ export class TransactionsPage implements OnInit {
 
   setMonth(monthIndex: number): void {
     this.selectedMonth = monthIndex;
+  }
+
+  deleteTransaction(transactionId: string): void {
+    this.transactionStorage.softDeleteTransaction(transactionId);
   }
 
   trackByGroup(_: number, group: TransactionGroup): string {

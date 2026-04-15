@@ -244,6 +244,34 @@ export class TransactionStorageService {
     return transaction;
   }
 
+  softDeleteTransaction(transactionId: string): void {
+    const now = new Date().toISOString();
+    const next = this.transactionsSubject.value.filter(
+      (transaction) => transaction.id !== transactionId,
+    );
+
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const persisted = raw
+        ? (JSON.parse(raw) as Transaction[]).map((transaction) =>
+            transaction.id === transactionId
+              ? {
+                  ...transaction,
+                  deletedAt: now,
+                  updatedAt: now,
+                  synced: false,
+                  syncStatus: 'pending',
+                }
+              : transaction,
+          )
+        : next;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+    }
+
+    this.transactionsSubject.next(next);
+  }
+
   private loadTransactions(): Transaction[] {
     if (typeof localStorage === 'undefined') {
       return [...SEED_TRANSACTIONS];
