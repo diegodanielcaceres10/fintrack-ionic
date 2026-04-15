@@ -36,6 +36,9 @@ interface CategoryStat {
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
+  host: {
+    class: 'ion-page',
+  },
   imports: [
     CommonModule,
     AppShellComponent, // replaces IonHeader + IonToolbar + BottomNavComponent

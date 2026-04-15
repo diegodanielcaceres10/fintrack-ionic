@@ -22,6 +22,9 @@ export type UsageLevel = 'safe' | 'warning' | 'danger';
   templateUrl: './budget.page.html',
   styleUrls: ['./budget.page.scss'],
   standalone: true,
+  host: {
+    class: 'ion-page',
+  },
   imports: [
     CommonModule,
     AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav

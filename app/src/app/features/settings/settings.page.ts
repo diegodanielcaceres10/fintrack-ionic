@@ -22,6 +22,9 @@ interface SyncOption {
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
   standalone: true,
+  host: {
+    class: 'ion-page',
+  },
   imports: [
     CommonModule,
     AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav

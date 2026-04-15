@@ -57,6 +57,9 @@ interface CategoryMeta {
   templateUrl: './transactions.page.html',
   styleUrls: ['./transactions.page.scss'],
   standalone: true,
+  host: {
+    class: 'ion-page',
+  },
   imports: [
     CommonModule,
     FormsModule,

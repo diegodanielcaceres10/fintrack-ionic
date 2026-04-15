@@ -1,17 +1,22 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  ContentChild,
+  EventEmitter,
   Input,
   Output,
-  EventEmitter,
-  ContentChild,
   TemplateRef,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonContent } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 
-import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { AddTransactionComponent } from '../../../features/add-transaction/add-transaction.component';
+import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 
 export interface ShellAction {
   label: string;
@@ -30,39 +35,35 @@ export interface ShellAction {
     IonHeader,
     IonToolbar,
     IonContent,
+    IonFooter,
     BottomNavComponent,
     AddTransactionComponent,
   ],
 })
 export class AppShellComponent {
-  // ── Header inputs ─────────────────────────────────────────────────────────
   @Input() title = '';
   @Input() greeting?: string;
   @Input() showAvatar = false;
   @Input() avatarInitials = '';
   @Input() hasNotification = false;
 
-  // ── Header action ─────────────────────────────────────────────────────────
   @Input() action?: ShellAction;
   @Output() actionClick = new EventEmitter<void>();
 
-  // ── Subheader slot ────────────────────────────────────────────────────────
   @ContentChild('subheader') subheaderTpl?: TemplateRef<unknown>;
 
-  // ── ion-content ───────────────────────────────────────────────────────────
   @Input() fullscreen = true;
 
-  // ── Add transaction sheet ─────────────────────────────────────────────────
   showAddSheet = false;
 
   openAddSheet(): void {
     this.showAddSheet = true;
   }
+
   closeAddSheet(): void {
     this.showAddSheet = false;
   }
 
-  // ── Greeting ──────────────────────────────────────────────────────────────
   get greetingPrefix(): string {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning';

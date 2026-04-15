@@ -1,16 +1,12 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// app-shell.component.scss
-// ─────────────────────────────────────────────────────────────────────────────
 @use "../../../../design-system/variables" as v;
 
-// The shell fills the full viewport — host must be a block
 :host {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
+  background: var(--color-surface);
 }
-
-// ─── ion-header / ion-toolbar ─────────────────────────────────────────────────
 
 ion-header {
   ion-toolbar {
@@ -24,7 +20,11 @@ ion-header {
   }
 }
 
-// ─── Toolbar main row ─────────────────────────────────────────────────────────
+ion-content.page-content {
+  --background: var(--color-surface);
+  flex: 1 1 auto;
+  min-height: 0;
+}
 
 .shell-toolbar {
   &__row {
@@ -50,9 +50,8 @@ ion-header {
     margin-left: v.$space-6;
   }
 
-  // Plain title
   &__title {
-    font-size: v.$font-size-3xl; // 22px
+    font-size: v.$font-size-3xl;
     font-weight: v.$font-weight-semibold;
     color: var(--color-text-primary);
     margin: 0;
@@ -62,9 +61,8 @@ ion-header {
     text-overflow: ellipsis;
   }
 
-  // Greeting mode (dashboard)
   &__greeting-sub {
-    font-size: v.$font-size-sm; // 11px
+    font-size: v.$font-size-sm;
     color: var(--color-text-muted);
     font-weight: v.$font-weight-regular;
     margin: 0;
@@ -72,15 +70,13 @@ ion-header {
   }
 
   &__greeting-name {
-    font-size: v.$font-size-2xl; // 19px
+    font-size: v.$font-size-2xl;
     font-weight: v.$font-weight-semibold;
     color: var(--color-text-primary);
     margin: 0;
     line-height: v.$line-height-tight;
   }
 }
-
-// ─── Avatar ───────────────────────────────────────────────────────────────────
 
 .shell-avatar-wrap {
   position: relative;
@@ -113,9 +109,6 @@ ion-header {
   border: 1.5px solid var(--color-surface);
 }
 
-// ─── Action buttons ───────────────────────────────────────────────────────────
-
-// Ghost button — border + label + optional icon
 .shell-action-btn {
   display: inline-flex;
   align-items: center;
@@ -142,12 +135,12 @@ ion-header {
   &:hover {
     background: var(--color-accent-muted);
   }
+
   &:active {
     background: var(--color-accent-border);
   }
 }
 
-// Square icon-only button
 .shell-icon-btn {
   width: 36px;
   height: 36px;
@@ -170,4 +163,10 @@ ion-header {
   &:hover {
     background: var(--color-bg);
   }
+}
+
+.shell-footer {
+  --background: transparent;
+  background: transparent;
+  box-shadow: none;
 }

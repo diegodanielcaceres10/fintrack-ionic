@@ -1,9 +1,10 @@
 <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
-  <!-- Home -->
   <a
     class="nav-item"
     routerLink="/home"
+    routerDirection="root"
     routerLinkActive="nav-item--active"
+    [routerLinkActiveOptions]="{ exact: true }"
     [attr.aria-current]="rlaHome.isActive ? 'page' : null"
     #rlaHome="routerLinkActive"
     aria-label="Home"
@@ -25,11 +26,12 @@
     }
   </a>
 
-  <!-- Transactions -->
   <a
     class="nav-item"
     routerLink="/transactions"
+    routerDirection="root"
     routerLinkActive="nav-item--active"
+    [routerLinkActiveOptions]="{ exact: true }"
     [attr.aria-current]="rlaTxn.isActive ? 'page' : null"
     #rlaTxn="routerLinkActive"
     aria-label="Transactions"
@@ -58,7 +60,6 @@
     }
   </a>
 
-  <!-- FAB — no route, emits fabTap to parent -->
   <button
     class="nav-fab"
     (click)="onFabClick()"
@@ -75,11 +76,12 @@
     </svg>
   </button>
 
-  <!-- Budget -->
   <a
     class="nav-item"
     routerLink="/budget"
+    routerDirection="root"
     routerLinkActive="nav-item--active"
+    [routerLinkActiveOptions]="{ exact: true }"
     [attr.aria-current]="rlaBudget.isActive ? 'page' : null"
     #rlaBudget="routerLinkActive"
     aria-label="Budget"
@@ -103,11 +105,12 @@
     }
   </a>
 
-  <!-- Settings -->
   <a
     class="nav-item"
     routerLink="/settings"
+    routerDirection="root"
     routerLinkActive="nav-item--active"
+    [routerLinkActiveOptions]="{ exact: true }"
     [attr.aria-current]="rlaSettings.isActive ? 'page' : null"
     #rlaSettings="routerLinkActive"
     aria-label="Settings"

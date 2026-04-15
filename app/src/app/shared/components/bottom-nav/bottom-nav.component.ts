@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IonRouterLinkWithHref } from '@ionic/angular/standalone';
 
 // ─── Component ───────────────────────────────────────────────────────────────
 // Navigation is now driven entirely by Angular Router:
@@ -18,7 +19,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './bottom-nav.component.html',
   styleUrls: ['./bottom-nav.component.scss'],
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, IonRouterLinkWithHref],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomNavComponent {
