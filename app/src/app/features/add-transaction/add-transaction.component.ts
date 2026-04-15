@@ -73,7 +73,7 @@ export class AddTransactionComponent implements OnInit {
   @ViewChild('sheet') sheetRef!: ElementRef<HTMLElement>;
 
   // ── Visibility ─────────────────────────────────────────────────────────────
-  visible = false;
+  visible = true;
 
   open(): void {
     this.visible = true;
@@ -199,7 +199,5 @@ export class AddTransactionComponent implements OnInit {
     this.close();
   }
 
-  ngOnInit(): void {
-    setTimeout(() => this.open(), 10);
-  }
+  ngOnInit(): void {}
 }
