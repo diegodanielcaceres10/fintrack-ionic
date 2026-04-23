@@ -151,6 +151,7 @@
   border: 1px solid var(--color-border);
   border-radius: v.$radius-md;
   padding: v.$space-7;
+  cursor: pointer;
 
   &__icon {
     width: 38px;
@@ -206,6 +207,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: v.$space-4;
+  }
+
+  &__hint {
+    font-size: v.$font-size-xs;
+    color: var(--color-text-muted);
+  }
+
+  &__delete {
+    border: none;
+    background: transparent;
+    color: var(--color-expense);
+    font: inherit;
+    font-size: v.$font-size-xs;
+    font-weight: v.$font-weight-semibold;
+    padding: 0;
+    cursor: pointer;
   }
 
   &__spent {
