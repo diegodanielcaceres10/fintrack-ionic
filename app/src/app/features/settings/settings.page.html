@@ -1,5 +1,4 @@
 <app-shell title="Settings">
-  <!-- ── Section: Sync mode ────────────────────────────────────────────────── -->
   <div class="section">
     <p class="section__label">Sync mode</p>
 
@@ -35,12 +34,10 @@
     </div>
   </div>
 
-  <!-- ── Section: Sync status ──────────────────────────────────────────────── -->
   <div class="section">
     <p class="section__label">Sync status</p>
 
     <div class="card">
-      <!-- Last synced row -->
       <div class="status-row">
         <div class="status-row__left">
           <span class="icon-wrap icon-wrap--bordered">
@@ -76,7 +73,6 @@
 
       <div class="card__divider"></div>
 
-      <!-- Pending records row -->
       <div class="status-row">
         <div class="status-row__left">
           <span class="icon-wrap icon-wrap--warning">
@@ -102,7 +98,6 @@
           </div>
         </div>
 
-        <!-- Badge via shared BadgeComponent -->
         <app-badge
           *ngIf="pendingRecords > 0"
           variant="warning"
@@ -119,7 +114,6 @@
 
       <div class="card__divider"></div>
 
-      <!-- Sync now button — uses .btn-primary from design system -->
       <div class="sync-btn-wrap">
         <button
           class="btn-primary"
@@ -153,12 +147,65 @@
     </div>
   </div>
 
-  <!-- ── Section: Account ──────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section__heading">
+      <p class="section__label">Categories</p>
+      <button class="section__action" (click)="openCreateCategory()">Add</button>
+    </div>
+
+    <div class="card">
+      <div
+        class="category-row"
+        *ngFor="let category of categories; trackBy: trackByCategory; let last = last"
+      >
+        <div class="category-row__left">
+          <span
+            class="category-row__icon"
+            [style.background]="category.bg"
+            [style.color]="category.color"
+          >
+            {{ category.icon }}
+          </span>
+          <div class="category-row__text">
+            <span class="category-row__name">{{ category.label }}</span>
+            <span class="category-row__sub">
+              {{ category.type }} · {{ category.isSystem ? 'System' : 'Custom' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="category-row__actions">
+          <button
+            *ngIf="!category.isSystem"
+            class="category-row__btn"
+            (click)="openEditCategory(category)"
+          >
+            Edit
+          </button>
+          <button
+            *ngIf="canDeleteCategory(category)"
+            class="category-row__btn category-row__btn--danger"
+            (click)="askDeleteCategory(category)"
+          >
+            Delete
+          </button>
+          <app-badge
+            *ngIf="!category.isSystem && !canDeleteCategory(category)"
+            variant="warning"
+            label="In use"
+          />
+          <app-badge *ngIf="category.isSystem" variant="success" label="Base" />
+        </div>
+
+        <span class="card__divider" *ngIf="!last"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="section">
     <p class="section__label">Account</p>
 
     <div class="card">
-      <!-- Email row -->
       <div class="account-row">
         <span class="icon-wrap icon-wrap--accent">
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -185,7 +232,6 @@
 
       <div class="card__divider"></div>
 
-      <!-- Logout row -->
       <button
         class="logout-row"
         (click)="logout()"
@@ -227,6 +273,20 @@
     </div>
   </div>
 
-  <!-- App version -->
   <p class="app-version">Kora · v1.0.0</p>
 </app-shell>
+
+<app-category-sheet
+  *ngIf="editingCategory"
+  [initialCategory]="editingCategory.id ? editingCategory : null"
+  (saved)="saveCategory($event)"
+  (closed)="closeCategorySheet()"
+/>
+
+<ion-alert
+  [isOpen]="!!deletingCategory"
+  header="Delete category?"
+  [message]="deleteCategoryMessage()"
+  [buttons]="deleteCategoryButtons"
+  (didDismiss)="closeDeleteCategoryAlert()"
+/>

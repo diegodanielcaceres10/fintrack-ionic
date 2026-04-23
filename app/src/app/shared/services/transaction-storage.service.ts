@@ -4,8 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 import {
   CreateTransactionInput,
   Transaction,
-  TRANSACTION_CATEGORIES,
 } from '../models/transaction.model';
+import { CategoryStorageService } from './category-storage.service';
 
 const STORAGE_KEY = 'fintrack.transactions.v2';
 
@@ -19,6 +19,8 @@ export class TransactionStorageService {
   );
 
   readonly transactions$ = this.transactionsSubject.asObservable();
+
+  constructor(private readonly categoryStorage: CategoryStorageService) {}
 
   addTransaction(input: CreateTransactionInput): Transaction {
     const now = new Date().toISOString();
@@ -155,6 +157,6 @@ export class TransactionStorageService {
   ): string {
     const trimmed = note.trim();
     if (trimmed) return trimmed;
-    return TRANSACTION_CATEGORIES[categoryId].label;
+    return this.categoryStorage.getCategoryMap()[categoryId]?.label ?? 'Other';
   }
 }

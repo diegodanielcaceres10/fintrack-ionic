@@ -1,8 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { IonAlert } from '@ionic/angular/standalone';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { CategorySheetComponent } from '../../shared/components/category-sheet/category-sheet.component';
+import {
+  CategoryDefinition,
+  SaveCategoryInput,
+} from '../../shared/models/category.model';
+import { BudgetStorageService } from '../../shared/services/budget-storage.service';
+import { CategoryStorageService } from '../../shared/services/category-storage.service';
+import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -27,11 +37,26 @@ interface SyncOption {
   },
   imports: [
     CommonModule,
+    IonAlert,
     AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav
     BadgeComponent, // pending count + synced checkmark badges
+    CategorySheetComponent,
   ],
 })
-export class SettingsPage implements OnInit {
+export class SettingsPage implements OnInit, OnDestroy {
+  private categoriesSubscription?: Subscription;
+  private transactionsSubscription?: Subscription;
+  private budgetsSubscription?: Subscription;
+  private transactionCategoryIds: string[] = [];
+  private budgetCategoryIds: string[] = [];
+  private usedCategoryIds = new Set<string>();
+
+  constructor(
+    private readonly categoryStorage: CategoryStorageService,
+    private readonly transactionStorage: TransactionStorageService,
+    private readonly budgetStorage: BudgetStorageService,
+  ) {}
+
   // ── Sync mode ──────────────────────────────────────────────────────────────
   selectedSyncMode: SyncMode = 'daily';
 
@@ -118,10 +143,131 @@ export class SettingsPage implements OnInit {
   // ── Account ────────────────────────────────────────────────────────────────
   readonly userEmail = 'alex.johnson@email.com';
 
+  categories: CategoryDefinition[] = [];
+  editingCategory: CategoryDefinition | null = null;
+  deletingCategory: CategoryDefinition | null = null;
+
+  readonly deleteCategoryButtons = [
+    {
+      text: 'Cancel',
+      role: 'cancel',
+    },
+    {
+      text: 'Delete',
+      role: 'destructive',
+      handler: () => this.confirmDeleteCategory(),
+    },
+  ];
+
   logout(): void {
     // TODO: connect to auth service
     console.log('logout');
   }
 
-  ngOnInit(): void {}
+  openCreateCategory(): void {
+    this.editingCategory = {
+      id: '',
+      label: '',
+      icon: '',
+      bg: '#4F46E51A',
+      color: '#4F46E5',
+      type: 'expense',
+      isSystem: false,
+    };
+  }
+
+  openEditCategory(category: CategoryDefinition): void {
+    if (category.isSystem) {
+      return;
+    }
+
+    this.editingCategory = category;
+  }
+
+  closeCategorySheet(): void {
+    this.editingCategory = null;
+  }
+
+  saveCategory(input: SaveCategoryInput): void {
+    this.categoryStorage.saveCategory(input);
+    this.closeCategorySheet();
+  }
+
+  askDeleteCategory(category: CategoryDefinition): void {
+    if (category.isSystem || !this.canDeleteCategory(category)) {
+      return;
+    }
+
+    this.deletingCategory = category;
+  }
+
+  closeDeleteCategoryAlert(): void {
+    this.deletingCategory = null;
+  }
+
+  deleteCategoryMessage(): string {
+    if (!this.deletingCategory) {
+      return '';
+    }
+
+    return `Delete "${this.deletingCategory.label}"? Existing transactions will keep the saved category id, so remove only unused custom categories.`;
+  }
+
+  trackByCategory(_: number, category: CategoryDefinition): string {
+    return category.id;
+  }
+
+  canDeleteCategory(category: CategoryDefinition): boolean {
+    return !category.isSystem && !this.usedCategoryIds.has(category.id);
+  }
+
+  ngOnInit(): void {
+    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+      (categories) => {
+        this.categories = [...categories].sort((a, b) => {
+          if (a.isSystem !== b.isSystem) {
+            return a.isSystem ? -1 : 1;
+          }
+
+          return a.label.localeCompare(b.label);
+        });
+      },
+    );
+
+    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+      (transactions) => {
+        this.transactionCategoryIds = transactions.map(
+          (transaction) => transaction.category,
+        );
+        this.syncUsedCategoryIds();
+      },
+    );
+
+    this.budgetsSubscription = this.budgetStorage.budgets$.subscribe((budgets) => {
+      this.budgetCategoryIds = budgets.map((budget) => budget.categoryId);
+      this.syncUsedCategoryIds();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.categoriesSubscription?.unsubscribe();
+    this.transactionsSubscription?.unsubscribe();
+    this.budgetsSubscription?.unsubscribe();
+  }
+
+  private confirmDeleteCategory(): void {
+    if (!this.deletingCategory) {
+      return;
+    }
+
+    this.categoryStorage.deleteCategory(this.deletingCategory.id);
+    this.deletingCategory = null;
+  }
+
+  private syncUsedCategoryIds(): void {
+    this.usedCategoryIds = new Set([
+      ...this.transactionCategoryIds,
+      ...this.budgetCategoryIds,
+    ]);
+  }
 }

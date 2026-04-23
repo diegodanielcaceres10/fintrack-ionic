@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -15,8 +15,9 @@ import {
   CreateTransactionInput,
   SyncStatus,
   Transaction,
-  TRANSACTION_CATEGORIES,
+  TransactionCategoryMeta,
 } from '../../shared/models/transaction.model';
+import { CategoryStorageService } from '../../shared/services/category-storage.service';
 import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 export type FilterPill = 'all' | 'expenses' | 'income';
@@ -50,13 +51,17 @@ export interface TransactionGroup {
     PositiveTotalPipe,
   ],
 })
-export class TransactionsPage implements OnInit {
+export class TransactionsPage implements OnInit, OnDestroy {
   private transactionsSubscription?: Subscription;
+  private categoriesSubscription?: Subscription;
   private allTransactions: Transaction[] = [];
 
   constructor(
     private readonly transactionStorage: TransactionStorageService,
-  ) {}
+    private readonly categoryStorage: CategoryStorageService,
+  ) {
+    this.categoryMeta = this.categoryStorage.getCategoryMap();
+  }
 
   searchQuery = '';
   activeFilter: FilterPill = 'all';
@@ -83,7 +88,7 @@ export class TransactionsPage implements OnInit {
     variant: 'icon-only' as const,
   };
 
-  readonly categoryMeta = TRANSACTION_CATEGORIES;
+  categoryMeta: Record<string, TransactionCategoryMeta> = {};
   editingTransaction: Transaction | null = null;
   pendingDeleteTransaction: Transaction | null = null;
   actionMenuTransaction: Transaction | null = null;
@@ -277,10 +282,27 @@ export class TransactionsPage implements OnInit {
   }
 
   ngOnInit(): void {
+    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+      (categories) => {
+        this.categoryMeta = categories.reduce<Record<string, TransactionCategoryMeta>>(
+          (acc, category) => {
+            acc[category.id] = category;
+            return acc;
+          },
+          {},
+        );
+      },
+    );
+
     this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
       (transactions) => {
         this.allTransactions = transactions;
       },
     );
+  }
+
+  ngOnDestroy(): void {
+    this.categoriesSubscription?.unsubscribe();
+    this.transactionsSubscription?.unsubscribe();
   }
 }

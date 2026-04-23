@@ -6,12 +6,13 @@ import { IonActionSheet, IonAlert } from '@ionic/angular/standalone';
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { Budget } from '../../shared/models/budget.model';
+import { CategoryDefinition } from '../../shared/models/category.model';
 import {
   Transaction,
   TransactionCategory,
-  TRANSACTION_CATEGORIES,
 } from '../../shared/models/transaction.model';
 import { BudgetStorageService } from '../../shared/services/budget-storage.service';
+import { CategoryStorageService } from '../../shared/services/category-storage.service';
 import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 interface BudgetView {
@@ -51,8 +52,11 @@ export class BudgetPage implements OnInit, OnDestroy {
   private readonly today = new Date();
   private budgetsSubscription?: Subscription;
   private transactionsSubscription?: Subscription;
+  private categoriesSubscription?: Subscription;
   private budgets: Budget[] = [];
   private transactions: Transaction[] = [];
+  private categories: CategoryDefinition[] = [];
+  private categoryMeta: Record<string, CategoryDefinition> = {};
 
   currentDate = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
   budgetItems: BudgetView[] = [];
@@ -94,7 +98,7 @@ export class BudgetPage implements OnInit, OnDestroy {
   get categoryActionButtons() {
     return [
       ...this.availableBudgetCategories.map((categoryId) => ({
-        text: TRANSACTION_CATEGORIES[categoryId].label,
+        text: this.categoryMeta[categoryId]?.label ?? categoryId,
         handler: () => this.openBudgetForm(categoryId),
       })),
       {
@@ -105,14 +109,12 @@ export class BudgetPage implements OnInit, OnDestroy {
   }
 
   get availableBudgetCategories(): TransactionCategory[] {
-    return (Object.entries(TRANSACTION_CATEGORIES) as Array<
-      [TransactionCategory, (typeof TRANSACTION_CATEGORIES)[TransactionCategory]]
-    >)
-      .filter(([, meta]) => meta.type !== 'income')
-      .map(([categoryId]) => categoryId)
+    return this.categories
+      .filter((category) => category.type !== 'income')
+      .map((category) => category.id)
       .sort((a, b) =>
-        TRANSACTION_CATEGORIES[a].label.localeCompare(
-          TRANSACTION_CATEGORIES[b].label,
+        (this.categoryMeta[a]?.label ?? a).localeCompare(
+          this.categoryMeta[b]?.label ?? b,
         ),
       );
   }
@@ -134,7 +136,11 @@ export class BudgetPage implements OnInit, OnDestroy {
   constructor(
     private readonly budgetStorage: BudgetStorageService,
     private readonly transactionStorage: TransactionStorageService,
-  ) {}
+    private readonly categoryStorage: CategoryStorageService,
+  ) {
+    this.categoryMeta = this.categoryStorage.getCategoryMap();
+    this.categories = Object.values(this.categoryMeta);
+  }
 
   prevMonth(): void {
     this.currentDate = new Date(
@@ -241,6 +247,20 @@ export class BudgetPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+      (categories) => {
+        this.categories = categories;
+        this.categoryMeta = categories.reduce<Record<string, CategoryDefinition>>(
+          (acc, category) => {
+            acc[category.id] = category;
+            return acc;
+          },
+          {},
+        );
+        this.rebuildBudgetItems();
+      },
+    );
+
     this.budgetsSubscription = this.budgetStorage.budgets$.subscribe((budgets) => {
       this.budgets = budgets;
       this.rebuildBudgetItems();
@@ -255,6 +275,7 @@ export class BudgetPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.categoriesSubscription?.unsubscribe();
     this.budgetsSubscription?.unsubscribe();
     this.transactionsSubscription?.unsubscribe();
   }
@@ -269,7 +290,7 @@ export class BudgetPage implements OnInit, OnDestroy {
 
     this.categoryPickerOpen = false;
     this.budgetFormCategoryId = categoryId;
-    this.budgetFormCategoryLabel = TRANSACTION_CATEGORIES[categoryId].label;
+    this.budgetFormCategoryLabel = this.categoryMeta[categoryId]?.label ?? categoryId;
     this.budgetFormMode = budgetToEdit ? 'edit' : 'create';
     this.budgetFormLimit = budgetToEdit ? String(budgetToEdit.limit) : '';
     this.budgetFormOpen = true;
@@ -333,8 +354,8 @@ export class BudgetPage implements OnInit, OnDestroy {
         return {
           id: budget.id,
           categoryId: budget.categoryId,
-          icon: TRANSACTION_CATEGORIES[budget.categoryId].icon,
-          name: TRANSACTION_CATEGORIES[budget.categoryId].label,
+          icon: this.categoryMeta[budget.categoryId]?.icon ?? '🏷️',
+          name: this.categoryMeta[budget.categoryId]?.label ?? budget.categoryId,
           spent,
           limit: budget.limit,
         };

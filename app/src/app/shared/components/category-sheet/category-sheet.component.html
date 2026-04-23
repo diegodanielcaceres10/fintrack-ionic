@@ -1,0 +1,118 @@
+@if (visible) {
+  <div class="overlay" [@overlay] (click)="close()" aria-hidden="true"></div>
+}
+
+@if (visible) {
+  <div
+    class="sheet"
+    [@sheet]
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="isEditing ? 'Edit category' : 'Add category'"
+  >
+    <div class="sheet__handle-area">
+      <div class="sheet__handle" aria-hidden="true"></div>
+    </div>
+
+    <div class="sheet__header">
+      <h2 class="sheet__title">
+        {{ isEditing ? 'Edit category' : 'Add category' }}
+      </h2>
+      <button class="sheet__close" (click)="close()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M18 6L6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="field-group">
+      <p class="field-group__label">Name</p>
+      <input
+        class="text-input"
+        type="text"
+        placeholder="Groceries, Pets, Side hustle..."
+        [(ngModel)]="label"
+        maxlength="32"
+      />
+    </div>
+
+    <div class="field-group">
+      <p class="field-group__label">Icon</p>
+      <input
+        class="text-input"
+        type="text"
+        placeholder="🏷️"
+        [(ngModel)]="icon"
+        maxlength="4"
+      />
+    </div>
+
+    <div class="field-group">
+      <p class="field-group__label">Type</p>
+      <div class="type-pills">
+        <button
+          class="type-pill"
+          [class.type-pill--active]="type === 'expense'"
+          (click)="selectType('expense')"
+        >
+          Expense
+        </button>
+        <button
+          class="type-pill"
+          [class.type-pill--active]="type === 'income'"
+          (click)="selectType('income')"
+        >
+          Income
+        </button>
+        <button
+          class="type-pill"
+          [class.type-pill--active]="type === 'both'"
+          (click)="selectType('both')"
+        >
+          Both
+        </button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <p class="field-group__label">Color</p>
+      <div class="color-grid">
+        @for (option of colorOptions; track option.value) {
+          <button
+            class="color-chip"
+            [class.color-chip--active]="color === option.value"
+            [style.background]="option.value"
+            (click)="selectColor(option.value)"
+            [attr.aria-label]="option.label"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <div class="preview-card" [style.border-color]="color">
+      <div class="preview-card__icon" [style.background]="color + '1A'">
+        {{ icon || '🏷️' }}
+      </div>
+      <div class="preview-card__text">
+        <span class="preview-card__name">{{ label || 'New category' }}</span>
+        <span class="preview-card__sub">{{ type }}</span>
+      </div>
+    </div>
+
+    <div class="sheet__footer">
+      <button
+        class="cta-btn"
+        [class.cta-btn--disabled]="!isValid"
+        [disabled]="!isValid"
+        (click)="submit()"
+      >
+        {{ isEditing ? 'Save category' : 'Create category' }}
+      </button>
+    </div>
+  </div>
+}

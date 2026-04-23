@@ -14,8 +14,9 @@ import { AppShellComponent } from '../../shared/components/app-shell/app-shell.c
 import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
 import {
   Transaction,
-  TRANSACTION_CATEGORIES,
+  TransactionCategoryMeta,
 } from '../../shared/models/transaction.model';
+import { CategoryStorageService } from '../../shared/services/category-storage.service';
 import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
@@ -41,11 +42,17 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   donutCanvas!: ElementRef<HTMLCanvasElement>;
 
   private transactionsSubscription?: Subscription;
+  private categoriesSubscription?: Subscription;
   private donutChart?: Chart;
+  private categoryMeta: Record<string, TransactionCategoryMeta> = {};
+  private allTransactions: Transaction[] = [];
 
   constructor(
     private readonly transactionStorage: TransactionStorageService,
-  ) {}
+    private readonly categoryStorage: CategoryStorageService,
+  ) {
+    this.categoryMeta = this.categoryStorage.getCategoryMap();
+  }
 
   balance = 0;
   monthlySpend = 0;
@@ -55,8 +62,27 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   transactions: Transaction[] = [];
 
   ngOnInit(): void {
+    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+      (categories) => {
+        this.categoryMeta = categories.reduce<Record<string, TransactionCategoryMeta>>(
+          (acc, category) => {
+            acc[category.id] = category;
+            return acc;
+          },
+          {},
+        );
+        this.categories = this.buildCategoryStats(
+          this.currentMonthTransactions(this.allTransactions).filter(
+            (txn) => txn.type === 'expense',
+          ),
+        );
+        this.updateDonutChart();
+      },
+    );
+
     this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
       (transactions) => {
+        this.allTransactions = transactions;
         this.transactions = [...transactions]
           .sort((a, b) => this.sortTransactionsByRecency(a, b))
           .slice(0, 6);
@@ -163,12 +189,8 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
 
     return Array.from(totals.entries())
       .map(([categoryId, amount]) => ({
-        name: TRANSACTION_CATEGORIES[categoryId as keyof typeof TRANSACTION_CATEGORIES]
-          .label,
-        color:
-          TRANSACTION_CATEGORIES[
-            categoryId as keyof typeof TRANSACTION_CATEGORIES
-          ].color,
+        name: this.categoryMeta[categoryId]?.label ?? categoryId,
+        color: this.categoryMeta[categoryId]?.color ?? '#6B7280',
         percentage: Math.max(1, Math.round((amount / totalSpent) * 100)),
       }))
       .sort((a, b) => b.percentage - a.percentage)
@@ -193,6 +215,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.categoriesSubscription?.unsubscribe();
     this.transactionsSubscription?.unsubscribe();
     this.donutChart?.destroy();
   }
@@ -211,11 +234,11 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   iconFor(txn: Transaction): string {
-    return TRANSACTION_CATEGORIES[txn.category].icon;
+    return this.categoryMeta[txn.category]?.icon ?? '🏷️';
   }
 
   iconBgFor(txn: Transaction): string {
-    return TRANSACTION_CATEGORIES[txn.category].bg;
+    return this.categoryMeta[txn.category]?.bg ?? '#F8F9FB';
   }
 
   formattedDate(txn: Transaction): string {

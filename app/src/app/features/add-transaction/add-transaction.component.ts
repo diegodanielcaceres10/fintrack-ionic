@@ -3,6 +3,7 @@ import {
   Input,
   OnInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   Output,
   EventEmitter,
@@ -13,6 +14,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { Subscription } from 'rxjs';
 
 import {
   CreateTransactionInput,
@@ -20,6 +22,8 @@ import {
   TransactionCategory,
   TransactionType,
 } from '../../shared/models/transaction.model';
+import { CategoryDefinition } from '../../shared/models/category.model';
+import { CategoryStorageService } from '../../shared/services/category-storage.service';
 
 interface CategoryOption {
   id: TransactionCategory;
@@ -59,7 +63,7 @@ const OVERLAY_ANIMATION = trigger('overlay', [
   imports: [FormsModule, DecimalPipe],
   animations: [SHEET_ANIMATION, OVERLAY_ANIMATION],
 })
-export class AddTransactionComponent implements OnInit, OnChanges {
+export class AddTransactionComponent implements OnInit, OnChanges, OnDestroy {
   @Input() initialTransaction: Transaction | null = null;
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<CreateTransactionInput>();
@@ -70,42 +74,31 @@ export class AddTransactionComponent implements OnInit, OnChanges {
   visible = true;
   type: TransactionType = 'expense';
   amountRaw = '';
-  selectedCategoryId: TransactionCategory = 'food';
+  selectedCategoryId: TransactionCategory = '';
   note = '';
   date = new Date().toISOString().split('T')[0];
 
-  readonly expenseCategories: CategoryOption[] = [
-    { id: 'food', icon: '🛒', label: 'Food' },
-    { id: 'housing', icon: '🏠', label: 'Housing' },
-    { id: 'transport', icon: '🚇', label: 'Transport' },
-    { id: 'entertainment', icon: '🎬', label: 'Entertainment' },
-    { id: 'health', icon: '💊', label: 'Health' },
-    { id: 'shopping', icon: '🛍️', label: 'Shopping' },
-    { id: 'utilities', icon: '⚡', label: 'Utilities' },
-    { id: 'travel', icon: '✈️', label: 'Travel' },
-    { id: 'other', icon: '📦', label: 'Other' },
-  ];
+  private categoriesSubscription?: Subscription;
+  private categoryDefinitions: CategoryDefinition[] = [];
+  private pendingInitialTransaction: Transaction | null = null;
 
-  readonly incomeCategories: CategoryOption[] = [
-    { id: 'salary', icon: '💰', label: 'Salary' },
-    { id: 'freelance', icon: '💻', label: 'Freelance' },
-    { id: 'gift', icon: '🎁', label: 'Gift' },
-    { id: 'refund', icon: '↩️', label: 'Refund' },
-    { id: 'other', icon: '📦', label: 'Other' },
-  ];
-
-  private dragStartY = 0;
-  private dragCurrent = 0;
-  private isDragging = false;
+  constructor(private readonly categoryStorage: CategoryStorageService) {}
 
   get amountValue(): number {
     return parseFloat(this.amountRaw) || 0;
   }
 
   get categories(): CategoryOption[] {
-    return this.type === 'expense'
-      ? this.expenseCategories
-      : this.incomeCategories;
+    return this.categoryDefinitions
+      .filter(
+        (category) =>
+          category.type === this.type || category.type === 'both',
+      )
+      .map((category) => ({
+        id: category.id,
+        icon: category.icon,
+        label: category.label,
+      }));
   }
 
   get isValid(): boolean {
@@ -127,7 +120,7 @@ export class AddTransactionComponent implements OnInit, OnChanges {
 
   setType(type: TransactionType): void {
     this.type = type;
-    this.selectedCategoryId = this.categories[0].id;
+    this.ensureSelectedCategory();
   }
 
   selectCategory(id: TransactionCategory): void {
@@ -188,14 +181,30 @@ export class AddTransactionComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.applyInitialTransaction();
+    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+      (categories) => {
+        this.categoryDefinitions = categories;
+        this.applyPendingState();
+      },
+    );
+    this.pendingInitialTransaction = this.initialTransaction;
+    this.applyPendingState();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialTransaction']) {
-      this.applyInitialTransaction();
+      this.pendingInitialTransaction = this.initialTransaction;
+      this.applyPendingState();
     }
   }
+
+  ngOnDestroy(): void {
+    this.categoriesSubscription?.unsubscribe();
+  }
+
+  private dragStartY = 0;
+  private dragCurrent = 0;
+  private isDragging = false;
 
   private clientY(event: TouchEvent | MouseEvent): number {
     return event instanceof TouchEvent
@@ -203,24 +212,48 @@ export class AddTransactionComponent implements OnInit, OnChanges {
       : event.clientY;
   }
 
-  private applyInitialTransaction(): void {
-    if (!this.initialTransaction) {
-      this.resetForm();
+  private applyPendingState(): void {
+    if (this.categoryDefinitions.length === 0) {
       return;
     }
 
-    this.type = this.initialTransaction.type;
-    this.amountRaw = Math.abs(this.initialTransaction.amount).toString();
-    this.selectedCategoryId = this.initialTransaction.category;
-    this.note = this.initialTransaction.name;
-    this.date = this.initialTransaction.date;
+    if (this.pendingInitialTransaction) {
+      this.type = this.pendingInitialTransaction.type;
+      this.amountRaw = Math.abs(this.pendingInitialTransaction.amount).toString();
+      this.selectedCategoryId = this.pendingInitialTransaction.category;
+      this.note = this.pendingInitialTransaction.name;
+      this.date = this.pendingInitialTransaction.date;
+      this.ensureSelectedCategory();
+      this.pendingInitialTransaction = null;
+      return;
+    }
+
+    if (!this.initialTransaction) {
+      this.resetForm();
+    }
   }
 
   private resetForm(): void {
     this.type = 'expense';
     this.amountRaw = '';
-    this.selectedCategoryId = 'food';
+    this.selectedCategoryId = '';
     this.note = '';
     this.date = new Date().toISOString().split('T')[0];
+    this.ensureSelectedCategory();
+  }
+
+  private ensureSelectedCategory(): void {
+    if (this.categories.length === 0) {
+      this.selectedCategoryId = '';
+      return;
+    }
+
+    const exists = this.categories.some(
+      (category) => category.id === this.selectedCategoryId,
+    );
+
+    if (!exists) {
+      this.selectedCategoryId = this.categories[0].id;
+    }
   }
 }

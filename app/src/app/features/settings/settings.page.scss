@@ -23,6 +23,21 @@
   }
 }
 
+.section__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section__action {
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: v.$font-weight-semibold;
+  padding: 0 4px v.$space-4;
+}
+
 // ─── Card ─────────────────────────────────────────────────────────────────────
 // .card and .card__divider are defined in _components.scss globally.
 // Extend only with page-specific overrides.
@@ -232,6 +247,73 @@
     height: 16px;
     color: var(--color-text-muted);
     flex-shrink: 0;
+  }
+}
+
+.category-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$space-6;
+  padding: v.$space-7 v.$space-8;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: v.$space-5;
+    min-width: 0;
+  }
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: v.$radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: v.$font-size-base;
+    font-weight: v.$font-weight-medium;
+    color: var(--color-text-primary);
+  }
+
+  &__sub {
+    font-size: v.$font-size-sm;
+    color: var(--color-text-muted);
+    text-transform: capitalize;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    border: none;
+    background: transparent;
+    color: var(--color-accent);
+    font: inherit;
+    font-size: v.$font-size-sm;
+    font-weight: v.$font-weight-semibold;
+    padding: 0;
+
+    &--danger {
+      color: var(--color-danger);
+    }
   }
 }
 
