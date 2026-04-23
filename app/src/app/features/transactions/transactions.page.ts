@@ -2,14 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { IonActionSheet, IonAlert } from '@ionic/angular/standalone';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { GroupHeaderComponent } from '../../shared/components/group-header/group-header.component';
 import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
 import { GroupTotalPipe, PositiveTotalPipe } from './transaction.pipes';
 import {
+  CreateTransactionInput,
   SyncStatus,
   Transaction,
   TRANSACTION_CATEGORIES,
@@ -35,11 +38,14 @@ export interface TransactionGroup {
   imports: [
     CommonModule,
     FormsModule,
+    IonActionSheet,
+    IonAlert,
     AppShellComponent,
     GroupHeaderComponent,
     ListRowComponent,
     EmptyStateComponent,
     BadgeComponent,
+    AddTransactionComponent,
     GroupTotalPipe,
     PositiveTotalPipe,
   ],
@@ -78,6 +84,37 @@ export class TransactionsPage implements OnInit {
   };
 
   readonly categoryMeta = TRANSACTION_CATEGORIES;
+  editingTransaction: Transaction | null = null;
+  pendingDeleteTransaction: Transaction | null = null;
+  actionMenuTransaction: Transaction | null = null;
+
+  readonly deleteAlertButtons = [
+    {
+      text: 'Cancel',
+      role: 'cancel',
+    },
+    {
+      text: 'Delete',
+      role: 'destructive',
+      handler: () => this.confirmDelete(),
+    },
+  ];
+
+  readonly actionSheetButtons = [
+    {
+      text: 'Edit',
+      handler: () => this.editFromActionMenu(),
+    },
+    {
+      text: 'Delete',
+      role: 'destructive',
+      handler: () => this.deleteFromActionMenu(),
+    },
+    {
+      text: 'Cancel',
+      role: 'cancel',
+    },
+  ];
 
   get groups(): TransactionGroup[] {
     const today = new Date();
@@ -157,8 +194,78 @@ export class TransactionsPage implements OnInit {
     this.selectedMonth = monthIndex;
   }
 
-  deleteTransaction(transactionId: string): void {
-    this.transactionStorage.softDeleteTransaction(transactionId);
+  startEdit(transaction: Transaction): void {
+    this.editingTransaction = transaction;
+  }
+
+  closeEditSheet(): void {
+    this.editingTransaction = null;
+  }
+
+  saveEditedTransaction(payload: CreateTransactionInput): void {
+    if (!this.editingTransaction) {
+      return;
+    }
+
+    this.transactionStorage.updateTransaction(this.editingTransaction.id, payload);
+    this.closeEditSheet();
+  }
+
+  onDeleteClick(event: Event, transaction: Transaction): void {
+    event.stopPropagation();
+    this.pendingDeleteTransaction = transaction;
+  }
+
+  onMenuClick(event: Event, transaction: Transaction): void {
+    event.stopPropagation();
+    this.actionMenuTransaction = transaction;
+  }
+
+  closeActionMenu(): void {
+    this.actionMenuTransaction = null;
+  }
+
+  actionSheetHeader(): string {
+    return this.actionMenuTransaction?.name ?? 'Transaction actions';
+  }
+
+  closeDeleteAlert(): void {
+    this.pendingDeleteTransaction = null;
+  }
+
+  deleteAlertMessage(): string {
+    if (!this.pendingDeleteTransaction) {
+      return '';
+    }
+
+    return `Delete "${this.pendingDeleteTransaction.name}"? This transaction will be removed from the list and marked as pending sync.`;
+  }
+
+  private confirmDelete(): void {
+    if (!this.pendingDeleteTransaction) {
+      return;
+    }
+
+    this.transactionStorage.softDeleteTransaction(this.pendingDeleteTransaction.id);
+    this.pendingDeleteTransaction = null;
+  }
+
+  private editFromActionMenu(): void {
+    if (!this.actionMenuTransaction) {
+      return;
+    }
+
+    this.editingTransaction = this.actionMenuTransaction;
+    this.actionMenuTransaction = null;
+  }
+
+  private deleteFromActionMenu(): void {
+    if (!this.actionMenuTransaction) {
+      return;
+    }
+
+    this.pendingDeleteTransaction = this.actionMenuTransaction;
+    this.actionMenuTransaction = null;
   }
 
   trackByGroup(_: number, group: TransactionGroup): string {

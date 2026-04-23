@@ -1,6 +1,9 @@
 import {
   Component,
+  Input,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   Output,
   EventEmitter,
   HostListener,
@@ -13,6 +16,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 
 import {
   CreateTransactionInput,
+  Transaction,
   TransactionCategory,
   TransactionType,
 } from '../../shared/models/transaction.model';
@@ -55,7 +59,8 @@ const OVERLAY_ANIMATION = trigger('overlay', [
   imports: [FormsModule, DecimalPipe],
   animations: [SHEET_ANIMATION, OVERLAY_ANIMATION],
 })
-export class AddTransactionComponent implements OnInit {
+export class AddTransactionComponent implements OnInit, OnChanges {
+  @Input() initialTransaction: Transaction | null = null;
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<CreateTransactionInput>();
 
@@ -105,6 +110,10 @@ export class AddTransactionComponent implements OnInit {
 
   get isValid(): boolean {
     return this.amountValue > 0 && !!this.selectedCategoryId;
+  }
+
+  get isEditing(): boolean {
+    return !!this.initialTransaction;
   }
 
   open(): void {
@@ -178,11 +187,40 @@ export class AddTransactionComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.applyInitialTransaction();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['initialTransaction']) {
+      this.applyInitialTransaction();
+    }
+  }
 
   private clientY(event: TouchEvent | MouseEvent): number {
     return event instanceof TouchEvent
       ? (event.touches[0]?.clientY ?? 0)
       : event.clientY;
+  }
+
+  private applyInitialTransaction(): void {
+    if (!this.initialTransaction) {
+      this.resetForm();
+      return;
+    }
+
+    this.type = this.initialTransaction.type;
+    this.amountRaw = Math.abs(this.initialTransaction.amount).toString();
+    this.selectedCategoryId = this.initialTransaction.category;
+    this.note = this.initialTransaction.name;
+    this.date = this.initialTransaction.date;
+  }
+
+  private resetForm(): void {
+    this.type = 'expense';
+    this.amountRaw = '';
+    this.selectedCategoryId = 'food';
+    this.note = '';
+    this.date = new Date().toISOString().split('T')[0];
   }
 }

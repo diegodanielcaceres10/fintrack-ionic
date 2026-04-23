@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -35,26 +36,21 @@ interface CategoryStat {
   },
   imports: [CommonModule, AppShellComponent, ListRowComponent],
 })
-export class HomePage implements OnInit, AfterViewInit {
+export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('donutCanvas', { static: false })
   donutCanvas!: ElementRef<HTMLCanvasElement>;
 
   private transactionsSubscription?: Subscription;
+  private donutChart?: Chart;
 
   constructor(
     private readonly transactionStorage: TransactionStorageService,
   ) {}
 
-  balance = 12840;
-  monthlySpend = 3240;
+  balance = 0;
+  monthlySpend = 0;
 
-  categories: CategoryStat[] = [
-    { name: 'Housing', color: '#4F46E5', percentage: 35 },
-    { name: 'Food', color: '#818CF8', percentage: 22 },
-    { name: 'Transport', color: '#34D399', percentage: 18 },
-    { name: 'Entertainment', color: '#FBBF24', percentage: 14 },
-    { name: 'Health', color: '#F87171', percentage: 11 },
-  ];
+  categories: CategoryStat[] = [];
 
   transactions: Transaction[] = [];
 
@@ -62,37 +58,37 @@ export class HomePage implements OnInit, AfterViewInit {
     this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
       (transactions) => {
         this.transactions = [...transactions]
-          .sort((a, b) => b.date.localeCompare(a.date))
+          .sort((a, b) => this.sortTransactionsByRecency(a, b))
           .slice(0, 6);
 
-        const monthlyTransactions = transactions.filter((txn) => {
-          const date = new Date(txn.date);
-          return (
-            date.getFullYear() === 2026 &&
-            date.getMonth() === 3 &&
-            txn.type === 'expense'
-          );
-        });
-
-        this.monthlySpend = Math.abs(
-          monthlyTransactions.reduce((sum, txn) => sum + txn.amount, 0),
+        const currentMonthTransactions = this.currentMonthTransactions(
+          transactions,
+        );
+        const monthlyExpenses = currentMonthTransactions.filter(
+          (txn) => txn.type === 'expense',
         );
 
-        const netBalance = transactions.reduce((sum, txn) => sum + txn.amount, 0);
-        this.balance = 12840 + netBalance;
+        this.monthlySpend = Math.abs(
+          monthlyExpenses.reduce((sum, txn) => sum + txn.amount, 0),
+        );
+
+        this.balance = transactions.reduce((sum, txn) => sum + txn.amount, 0);
+        this.categories = this.buildCategoryStats(monthlyExpenses);
+        this.updateDonutChart();
       },
     );
   }
 
   ngAfterViewInit(): void {
     this.initDonutChart();
+    this.updateDonutChart();
   }
 
   private initDonutChart(): void {
     const ctx = this.donutCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    new Chart(ctx, {
+    this.donutChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [
@@ -114,6 +110,91 @@ export class HomePage implements OnInit, AfterViewInit {
         animation: { animateRotate: true, duration: 800 },
       },
     });
+  }
+
+  private updateDonutChart(): void {
+    if (!this.donutChart) {
+      return;
+    }
+
+    this.donutChart.data.datasets[0].data = this.categories.map(
+      (category) => category.percentage,
+    );
+    this.donutChart.data.datasets[0].backgroundColor = this.categories.map(
+      (category) => category.color,
+    );
+    this.donutChart.update();
+  }
+
+  private currentMonthTransactions(transactions: Transaction[]): Transaction[] {
+    const now = new Date();
+
+    return transactions.filter((txn) => {
+      const date = new Date(txn.date);
+      return (
+        date.getFullYear() === now.getFullYear() &&
+        date.getMonth() === now.getMonth()
+      );
+    });
+  }
+
+  private buildCategoryStats(transactions: Transaction[]): CategoryStat[] {
+    if (transactions.length === 0) {
+      return [
+        {
+          name: 'No spending yet',
+          color: '#6B7280',
+          percentage: 100,
+        },
+      ];
+    }
+
+    const totals = new Map<string, number>();
+    for (const transaction of transactions) {
+      const nextValue =
+        (totals.get(transaction.category) ?? 0) + Math.abs(transaction.amount);
+      totals.set(transaction.category, nextValue);
+    }
+
+    const totalSpent = Array.from(totals.values()).reduce(
+      (sum, amount) => sum + amount,
+      0,
+    );
+
+    return Array.from(totals.entries())
+      .map(([categoryId, amount]) => ({
+        name: TRANSACTION_CATEGORIES[categoryId as keyof typeof TRANSACTION_CATEGORIES]
+          .label,
+        color:
+          TRANSACTION_CATEGORIES[
+            categoryId as keyof typeof TRANSACTION_CATEGORIES
+          ].color,
+        percentage: Math.max(1, Math.round((amount / totalSpent) * 100)),
+      }))
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 5);
+  }
+
+  private sortTransactionsByRecency(a: Transaction, b: Transaction): number {
+    const updatedDiff =
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+
+    if (updatedDiff !== 0) {
+      return updatedDiff;
+    }
+
+    return b.date.localeCompare(a.date);
+  }
+
+  chartAriaLabel(): string {
+    return `Spending by category: ${this.categories
+      .map((category) => `${category.name} ${category.percentage}%`)
+      .join(', ')}`;
+  }
+
+  ngOnDestroy(): void {
+    this.transactionsSubscription?.unsubscribe();
+    this.donutChart?.destroy();
   }
 
   formatAmount(amount: number): string {

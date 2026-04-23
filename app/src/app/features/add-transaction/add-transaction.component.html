@@ -11,7 +11,7 @@
     [@sheet]
     role="dialog"
     aria-modal="true"
-    aria-label="Add transaction"
+    [attr.aria-label]="isEditing ? 'Edit transaction' : 'Add transaction'"
   >
     <!-- Drag handle -->
     <div
@@ -28,7 +28,9 @@
 
     <!-- Header -->
     <div class="sheet__header">
-      <h2 class="sheet__title">Add transaction</h2>
+      <h2 class="sheet__title">
+        {{ isEditing ? 'Edit transaction' : 'Add transaction' }}
+      </h2>
       <button class="sheet__close" (click)="close()" aria-label="Close">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
@@ -182,7 +184,13 @@
         (click)="submit()"
       >
         @if (isValid) {
-          {{ type === "expense" ? "Add expense" : "Add income" }}
+          {{
+            isEditing
+              ? "Save changes"
+              : type === "expense"
+                ? "Add expense"
+                : "Add income"
+          }}
           @if (amountValue > 0) {
             <span class="cta-btn__amount"
               >&nbsp;·&nbsp;${{ amountValue | number: "1.0-2" }}</span

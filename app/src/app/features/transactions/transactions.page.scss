@@ -178,3 +178,34 @@
   cursor: pointer;
   padding: 0;
 }
+
+.txn-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+
+  &__dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-text-muted);
+  }
+}
+
+.txn-edit-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: v.$space-2;
+  color: var(--color-text-muted);
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+
+  &__chevron {
+    font-size: 14px;
+    line-height: 1;
+  }
+}

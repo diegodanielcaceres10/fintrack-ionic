@@ -1,7 +1,5 @@
 <app-shell title="Transactions" [action]="filterAction">
-  <!-- ── Subheader: search + month + filter pills ────────────────────────── -->
   <ng-template #subheader>
-    <!-- Search bar -->
     <div class="search-bar">
       <svg
         class="search-bar__icon"
@@ -26,7 +24,7 @@
       <input
         class="search-bar__input"
         type="search"
-        placeholder="Search transactions…"
+        placeholder="Search transactions..."
         [(ngModel)]="searchQuery"
         aria-label="Search transactions"
       />
@@ -47,7 +45,6 @@
       </button>
     </div>
 
-    <!-- Month strip -->
     <div class="month-strip" role="listbox" aria-label="Filter by month">
       <button
         class="month-strip__item"
@@ -61,7 +58,6 @@
       </button>
     </div>
 
-    <!-- Filter pills -->
     <div class="filter-pills" role="group" aria-label="Transaction type">
       <button
         class="pill"
@@ -87,17 +83,14 @@
     </div>
   </ng-template>
 
-  <!-- ── Empty state ───────────────────────────────────────────────────────── -->
   <app-empty-state
     *ngIf="groups.length === 0"
-    icon="🔍"
+    icon="?"
     title="No transactions found"
     subtitle="Try a different search or filter"
   />
 
-  <!-- ── Transaction groups ────────────────────────────────────────────────── -->
   <div class="txn-group" *ngFor="let group of groups; trackBy: trackByGroup">
-    <!-- Group header with day label + running total -->
     <app-group-header
       [label]="group.label"
       [variant]="groupVariant(group.items)"
@@ -105,7 +98,6 @@
       [totalPositive]="group.items | groupTotal | positiveTotal"
     />
 
-    <!-- Transaction rows -->
     <ul class="txn-list">
       <li *ngFor="let txn of group.items; trackBy: trackByTxn">
         <app-list-row
@@ -114,16 +106,17 @@
           [name]="txn.name"
           [amount]="formatAmount(txn.amount)"
           [amountVariant]="amountVariant(txn.amount)"
+          [interactive]="true"
+          (rowClick)="startEdit(txn)"
         >
-          <!-- Sub: category pill -->
           <span
             class="cat-pill"
             [style.background]="categoryMeta[txn.category].bg"
             [style.color]="categoryMeta[txn.category].color"
-            >{{ categoryMeta[txn.category].label }}</span
           >
+            {{ categoryMeta[txn.category].label }}
+          </span>
 
-          <!-- Sync badge -->
           <app-badge
             [variant]="syncVariant(txn.syncStatus)"
             [check]="txn.syncStatus === 'synced'"
@@ -131,9 +124,25 @@
           />
 
           <button
+            class="txn-menu-btn"
+            type="button"
+            (click)="onMenuClick($event, txn)"
+            aria-label="Open transaction actions"
+          >
+            <span class="txn-menu-btn__dot"></span>
+            <span class="txn-menu-btn__dot"></span>
+            <span class="txn-menu-btn__dot"></span>
+          </button>
+
+          <span class="txn-edit-hint" aria-hidden="true">
+            Tap to edit
+            <span class="txn-edit-hint__chevron">></span>
+          </span>
+
+          <button
             class="txn-delete-btn"
             type="button"
-            (click)="deleteTransaction(txn.id)"
+            (click)="onDeleteClick($event, txn)"
             aria-label="Delete transaction"
           >
             Delete
@@ -143,3 +152,25 @@
     </ul>
   </div>
 </app-shell>
+
+<app-add-transaction
+  *ngIf="editingTransaction"
+  [initialTransaction]="editingTransaction"
+  (saved)="saveEditedTransaction($event)"
+  (closed)="closeEditSheet()"
+/>
+
+<ion-alert
+  [isOpen]="!!pendingDeleteTransaction"
+  header="Delete transaction?"
+  [message]="deleteAlertMessage()"
+  [buttons]="deleteAlertButtons"
+  (didDismiss)="closeDeleteAlert()"
+/>
+
+<ion-action-sheet
+  [isOpen]="!!actionMenuTransaction"
+  [header]="actionSheetHeader()"
+  [buttons]="actionSheetButtons"
+  (didDismiss)="closeActionMenu()"
+/>

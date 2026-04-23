@@ -4,15 +4,13 @@
     <div class="metric-card metric-card--accent">
       <p class="metric-card__label">Total balance</p>
       <p class="metric-card__value">{{ formatBalance(balance) }}</p>
-      <p class="metric-card__change metric-card__change--up">
-        +2.4% this month
-      </p>
+      <p class="metric-card__change">Live from local transactions</p>
     </div>
 
     <div class="metric-card">
       <p class="metric-card__label">Monthly spend</p>
       <p class="metric-card__value">{{ formatBalance(monthlySpend) }}</p>
-      <p class="metric-card__change metric-card__change--down">+8.1% vs last</p>
+      <p class="metric-card__change">Current month expenses</p>
     </div>
   </section>
 
@@ -27,7 +25,7 @@
           width="130"
           height="130"
           role="img"
-          aria-label="Spending by category: Housing 35%, Food 22%, Transport 18%, Entertainment 14%, Health 11%"
+          [attr.aria-label]="chartAriaLabel()"
         ></canvas>
         <div class="donut-center">
           <span class="donut-center__label">total</span>
