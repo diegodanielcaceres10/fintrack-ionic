@@ -11,9 +11,9 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
 import { GroupTotalPipe, PositiveTotalPipe } from './transaction.pipes';
+import { SyncStatus } from '../../shared/models/sync.model';
 import {
   CreateTransactionInput,
-  SyncStatus,
   Transaction,
   TransactionCategoryMeta,
 } from '../../shared/models/transaction.model';

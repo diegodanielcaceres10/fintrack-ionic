@@ -19,7 +19,8 @@
 .status-row,
 .account-row,
 .logout-row,
-.category-row {
+.category-row,
+.deleted-row {
   display: flex;
   align-items: center;
   gap: v.$space-6;
@@ -124,8 +125,24 @@
 }
 
 .status-row,
-.category-row {
+.category-row,
+.deleted-row {
   justify-content: space-between;
+}
+
+.category-row,
+.deleted-row {
+  position: relative;
+
+  .card__divider {
+    position: absolute;
+    left: 60px;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--color-border);
+    pointer-events: none;
+  }
 }
 
 .status-row__left,
@@ -181,6 +198,35 @@
   &--danger {
     color: var(--color-danger);
   }
+}
+
+.deleted-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-1;
+  min-width: 0;
+}
+
+.deleted-row__name {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: var(--color-text-primary);
+}
+
+.deleted-row__sub {
+  font-size: v.$font-size-sm;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.deleted-row__restore {
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  padding: 0;
 }
 
 .logout-row {

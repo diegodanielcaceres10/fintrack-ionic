@@ -1,11 +1,11 @@
 import { TransactionCategory } from './transaction.model';
+import { SyncMeta } from './sync.model';
 
-export interface Budget {
+export interface Budget extends SyncMeta {
   id: string;
   categoryId: TransactionCategory;
   monthKey: string;
   limit: number;
-  updatedAt: string;
 }
 
 export interface SaveBudgetInput {

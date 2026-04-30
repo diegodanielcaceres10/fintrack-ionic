@@ -13,12 +13,22 @@ const STORAGE_KEY = 'fintrack.transactions.v2';
   providedIn: 'root',
 })
 export class TransactionStorageService {
-  private readonly initialTransactions = this.loadTransactions();
+  private readonly initialAllTransactions = this.loadAllTransactions();
+  private readonly allTransactionsSubject = new BehaviorSubject<Transaction[]>(
+    this.initialAllTransactions,
+  );
   private readonly transactionsSubject = new BehaviorSubject<Transaction[]>(
-    this.initialTransactions,
+    this.initialAllTransactions.filter((transaction) => !transaction.deletedAt),
+  );
+  private readonly deletedTransactionsSubject = new BehaviorSubject<
+    Transaction[]
+  >(
+    this.initialAllTransactions.filter((transaction) => !!transaction.deletedAt),
   );
 
+  readonly allTransactions$ = this.allTransactionsSubject.asObservable();
   readonly transactions$ = this.transactionsSubject.asObservable();
+  readonly deletedTransactions$ = this.deletedTransactionsSubject.asObservable();
 
   constructor(private readonly categoryStorage: CategoryStorageService) {}
 
@@ -43,8 +53,7 @@ export class TransactionStorageService {
       deletedAt: null,
     };
 
-    const next = [transaction, ...this.transactionsSubject.value];
-    this.persist(next);
+    this.persistAll([transaction, ...this.loadAllTransactions()]);
     return transaction;
   }
 
@@ -52,7 +61,7 @@ export class TransactionStorageService {
     transactionId: string,
     input: CreateTransactionInput,
   ): Transaction | null {
-    const current = this.transactionsSubject.value.find(
+    const current = this.loadAllTransactions().find(
       (transaction) => transaction.id === transactionId,
     );
 
@@ -80,43 +89,61 @@ export class TransactionStorageService {
       deletedAt: null,
     };
 
-    const next = this.transactionsSubject.value.map((transaction) =>
+    const next = this.loadAllTransactions().map((transaction) =>
       transaction.id === transactionId ? updatedTransaction : transaction,
     );
 
-    this.persist(next);
+    this.persistAll(next);
     return updatedTransaction;
   }
 
   softDeleteTransaction(transactionId: string): void {
     const now = new Date().toISOString();
-    const next = this.transactionsSubject.value.filter(
-      (transaction) => transaction.id !== transactionId,
+    this.persistAll(
+      this.loadAllTransactions().map((transaction) =>
+        transaction.id === transactionId
+          ? {
+              ...transaction,
+              deletedAt: now,
+              updatedAt: now,
+              synced: false,
+              syncStatus: 'pending',
+            }
+          : transaction,
+      ),
     );
-
-    if (typeof localStorage !== 'undefined') {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const persisted = raw
-        ? (JSON.parse(raw) as Transaction[]).map((transaction) =>
-            transaction.id === transactionId
-              ? {
-                  ...transaction,
-                  deletedAt: now,
-                  updatedAt: now,
-                  synced: false,
-                  syncStatus: 'pending',
-                }
-              : transaction,
-          )
-        : next;
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
-    }
-
-    this.transactionsSubject.next(next);
   }
 
-  private loadTransactions(): Transaction[] {
+  restoreTransaction(transactionId: string): void {
+    const now = new Date().toISOString();
+    this.persistAll(
+      this.loadAllTransactions().map((transaction) =>
+        transaction.id === transactionId
+          ? {
+              ...transaction,
+              deletedAt: null,
+              updatedAt: now,
+              synced: false,
+              syncStatus: 'pending',
+            }
+          : transaction,
+      ),
+    );
+  }
+
+  markAllSynced(): void {
+    const syncedAt = new Date().toISOString();
+    this.persistAll(
+      this.loadAllTransactions().map((transaction) => ({
+        ...transaction,
+        syncStatus: 'synced',
+        synced: true,
+        syncedAt,
+      })),
+    );
+  }
+
+  private loadAllTransactions(): Transaction[] {
     if (typeof localStorage === 'undefined') {
       return [];
     }
@@ -128,16 +155,26 @@ export class TransactionStorageService {
     }
 
     try {
-      const parsed = JSON.parse(raw) as Transaction[];
-      return parsed.filter((txn) => !txn.deletedAt);
+      return (JSON.parse(raw) as Partial<Transaction>[]).map((transaction) =>
+        this.normalizeTransaction(transaction),
+      );
     } catch {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
       return [];
     }
   }
 
-  private persist(transactions: Transaction[]): void {
-    this.transactionsSubject.next(transactions);
+  private persistAll(transactions: Transaction[]): void {
+    this.allTransactionsSubject.next(transactions);
+    this.transactionsSubject.next(
+      transactions.filter((transaction) => !transaction.deletedAt),
+    );
+    this.deletedTransactionsSubject.next(
+      transactions
+        .filter((transaction) => !!transaction.deletedAt)
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+    );
+
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
     }
@@ -158,5 +195,23 @@ export class TransactionStorageService {
     const trimmed = note.trim();
     if (trimmed) return trimmed;
     return this.categoryStorage.getCategoryMap()[categoryId]?.label ?? 'Other';
+  }
+
+  private normalizeTransaction(raw: Partial<Transaction>): Transaction {
+    const updatedAt = raw.updatedAt ?? new Date().toISOString();
+
+    return {
+      id: raw.id ?? this.createId(),
+      name: raw.name ?? 'Transaction',
+      category: raw.category ?? 'other',
+      date: raw.date ?? new Date().toISOString().slice(0, 10),
+      amount: typeof raw.amount === 'number' ? raw.amount : 0,
+      type: raw.type === 'income' ? 'income' : 'expense',
+      syncStatus: raw.synced === true ? 'synced' : raw.syncStatus ?? 'pending',
+      synced: raw.synced ?? raw.syncStatus === 'synced',
+      syncedAt: raw.syncedAt ?? null,
+      updatedAt,
+      deletedAt: raw.deletedAt ?? null,
+    };
   }
 }

@@ -1,20 +1,20 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IonAlert } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { CategorySheetComponent } from '../../shared/components/category-sheet/category-sheet.component';
+import { Budget } from '../../shared/models/budget.model';
 import {
   CategoryDefinition,
   SaveCategoryInput,
 } from '../../shared/models/category.model';
+import { Transaction } from '../../shared/models/transaction.model';
 import { BudgetStorageService } from '../../shared/services/budget-storage.service';
 import { CategoryStorageService } from '../../shared/services/category-storage.service';
 import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 export type SyncMode = 'manual' | 'daily' | 'automatic';
 export type SyncState = 'idle' | 'syncing' | 'success' | 'error';
@@ -24,8 +24,6 @@ interface SyncOption {
   label: string;
   subtitle: string;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-settings',
@@ -38,26 +36,24 @@ interface SyncOption {
   imports: [
     CommonModule,
     IonAlert,
-    AppShellComponent, // replaces IonHeader + IonToolbar + IonContent + bottom-nav
-    BadgeComponent, // pending count + synced checkmark badges
+    AppShellComponent,
+    BadgeComponent,
     CategorySheetComponent,
   ],
 })
 export class SettingsPage implements OnInit, OnDestroy {
   private categoriesSubscription?: Subscription;
+  private customCategoriesSubscription?: Subscription;
   private transactionsSubscription?: Subscription;
   private budgetsSubscription?: Subscription;
+  private deletedTransactionsSubscription?: Subscription;
   private transactionCategoryIds: string[] = [];
   private budgetCategoryIds: string[] = [];
   private usedCategoryIds = new Set<string>();
+  private customCategories: CategoryDefinition[] = [];
+  private transactions: Transaction[] = [];
+  private budgets: Budget[] = [];
 
-  constructor(
-    private readonly categoryStorage: CategoryStorageService,
-    private readonly transactionStorage: TransactionStorageService,
-    private readonly budgetStorage: BudgetStorageService,
-  ) {}
-
-  // ── Sync mode ──────────────────────────────────────────────────────────────
   selectedSyncMode: SyncMode = 'daily';
 
   readonly syncOptions: SyncOption[] = [
@@ -78,52 +74,65 @@ export class SettingsPage implements OnInit, OnDestroy {
     },
   ];
 
-  setSyncMode(mode: SyncMode): void {
-    this.selectedSyncMode = mode;
-  }
-
-  // ── Sync status ────────────────────────────────────────────────────────────
-  lastSyncedAt = new Date(Date.now() - 1000 * 60 * 47); // 47 min ago
-  pendingRecords = 3;
+  lastSyncedAt: Date | null = null;
+  pendingRecords = 0;
   syncState: SyncState = 'idle';
 
+  readonly userEmail = 'alex.johnson@email.com';
+
+  categories: CategoryDefinition[] = [];
+  deletedTransactions: Transaction[] = [];
+  editingCategory: CategoryDefinition | null = null;
+  deletingCategory: CategoryDefinition | null = null;
+
+  readonly deleteCategoryButtons = [
+    {
+      text: 'Cancel',
+      role: 'cancel',
+    },
+    {
+      text: 'Delete',
+      role: 'destructive',
+      handler: () => this.confirmDeleteCategory(),
+    },
+  ];
+
+  constructor(
+    private readonly categoryStorage: CategoryStorageService,
+    private readonly transactionStorage: TransactionStorageService,
+    private readonly budgetStorage: BudgetStorageService,
+  ) {}
+
   get lastSyncLabel(): string {
+    if (!this.lastSyncedAt) {
+      return 'Never';
+    }
+
     const diffMs = Date.now() - this.lastSyncedAt.getTime();
     const diffMin = Math.floor(diffMs / 60000);
+
     if (diffMin < 1) return 'Just now';
     if (diffMin < 60) return `${diffMin} min ago`;
-    const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return `${diffH}h ago`;
+
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
     return this.lastSyncedAt.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
   }
 
-  syncNow(): void {
-    if (this.syncState === 'syncing') return;
-    this.syncState = 'syncing';
-
-    setTimeout(() => {
-      this.syncState = 'success';
-      this.lastSyncedAt = new Date();
-      this.pendingRecords = 0;
-      setTimeout(() => {
-        this.syncState = 'idle';
-      }, 2500);
-    }, 1800);
-  }
-
   get syncBtnLabel(): string {
     switch (this.syncState) {
       case 'syncing':
-        return 'Syncing…';
+        return 'Syncing...';
       case 'success':
         return 'All caught up';
       case 'error':
         return 'Retry sync';
       default:
-        return 'Sync now';
+        return this.pendingRecords > 0 ? 'Sync now' : 'Refresh status';
     }
   }
 
@@ -140,27 +149,30 @@ export class SettingsPage implements OnInit, OnDestroy {
     }
   }
 
-  // ── Account ────────────────────────────────────────────────────────────────
-  readonly userEmail = 'alex.johnson@email.com';
+  setSyncMode(mode: SyncMode): void {
+    this.selectedSyncMode = mode;
+  }
 
-  categories: CategoryDefinition[] = [];
-  editingCategory: CategoryDefinition | null = null;
-  deletingCategory: CategoryDefinition | null = null;
+  syncNow(): void {
+    if (this.syncState === 'syncing') {
+      return;
+    }
 
-  readonly deleteCategoryButtons = [
-    {
-      text: 'Cancel',
-      role: 'cancel',
-    },
-    {
-      text: 'Delete',
-      role: 'destructive',
-      handler: () => this.confirmDeleteCategory(),
-    },
-  ];
+    this.syncState = 'syncing';
+
+    setTimeout(() => {
+      this.transactionStorage.markAllSynced();
+      this.budgetStorage.markAllSynced();
+      this.categoryStorage.markAllCustomSynced();
+      this.syncState = 'success';
+
+      setTimeout(() => {
+        this.syncState = 'idle';
+      }, 2500);
+    }, 600);
+  }
 
   logout(): void {
-    // TODO: connect to auth service
     console.log('logout');
   }
 
@@ -173,6 +185,10 @@ export class SettingsPage implements OnInit, OnDestroy {
       color: '#4F46E5',
       type: 'expense',
       isSystem: false,
+      syncStatus: 'pending',
+      synced: false,
+      syncedAt: null,
+      updatedAt: new Date().toISOString(),
     };
   }
 
@@ -217,6 +233,10 @@ export class SettingsPage implements OnInit, OnDestroy {
     return category.id;
   }
 
+  trackByTransaction(_: number, transaction: Transaction): string {
+    return transaction.id;
+  }
+
   canDeleteCategory(category: CategoryDefinition): boolean {
     return !category.isSystem && !this.usedCategoryIds.has(category.id);
   }
@@ -234,25 +254,47 @@ export class SettingsPage implements OnInit, OnDestroy {
       },
     );
 
+    this.customCategoriesSubscription =
+      this.categoryStorage.customCategories$.subscribe((categories) => {
+        this.customCategories = categories;
+        this.refreshSyncStatus();
+      });
+
     this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
       (transactions) => {
+        this.transactions = transactions;
         this.transactionCategoryIds = transactions.map(
           (transaction) => transaction.category,
         );
         this.syncUsedCategoryIds();
+        this.refreshSyncStatus();
       },
     );
 
     this.budgetsSubscription = this.budgetStorage.budgets$.subscribe((budgets) => {
+      this.budgets = budgets;
       this.budgetCategoryIds = budgets.map((budget) => budget.categoryId);
       this.syncUsedCategoryIds();
+      this.refreshSyncStatus();
     });
+
+    this.deletedTransactionsSubscription =
+      this.transactionStorage.deletedTransactions$.subscribe((transactions) => {
+        this.deletedTransactions = transactions;
+        this.refreshSyncStatus();
+      });
   }
 
   ngOnDestroy(): void {
     this.categoriesSubscription?.unsubscribe();
+    this.customCategoriesSubscription?.unsubscribe();
     this.transactionsSubscription?.unsubscribe();
     this.budgetsSubscription?.unsubscribe();
+    this.deletedTransactionsSubscription?.unsubscribe();
+  }
+
+  restoreTransaction(transactionId: string): void {
+    this.transactionStorage.restoreTransaction(transactionId);
   }
 
   private confirmDeleteCategory(): void {
@@ -269,5 +311,25 @@ export class SettingsPage implements OnInit, OnDestroy {
       ...this.transactionCategoryIds,
       ...this.budgetCategoryIds,
     ]);
+  }
+
+  private refreshSyncStatus(): void {
+    const allTransactions = [...this.transactions, ...this.deletedTransactions];
+    const syncedAtValues = [
+      ...allTransactions.map((transaction) => transaction.syncedAt),
+      ...this.budgets.map((budget) => budget.syncedAt),
+      ...this.customCategories.map((category) => category.syncedAt),
+    ].filter((value): value is string => !!value);
+
+    this.pendingRecords =
+      allTransactions.filter((transaction) => transaction.syncStatus === 'pending')
+        .length +
+      this.budgets.filter((budget) => budget.syncStatus === 'pending').length +
+      this.customCategories.filter((category) => category.syncStatus === 'pending')
+        .length;
+
+    this.lastSyncedAt = syncedAtValues.length
+      ? new Date(syncedAtValues.sort()[syncedAtValues.length - 1])
+      : null;
   }
 }

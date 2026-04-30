@@ -29,6 +29,9 @@ export class BudgetStorageService {
       const updatedBudget: Budget = {
         ...existing,
         limit: input.limit,
+        syncStatus: 'pending',
+        synced: false,
+        syncedAt: null,
         updatedAt: now,
       };
 
@@ -45,6 +48,9 @@ export class BudgetStorageService {
       categoryId: input.categoryId,
       monthKey: input.monthKey,
       limit: input.limit,
+      syncStatus: 'pending',
+      synced: false,
+      syncedAt: null,
       updatedAt: now,
     };
 
@@ -55,6 +61,18 @@ export class BudgetStorageService {
   deleteBudget(budgetId: string): void {
     this.persist(
       this.budgetsSubject.value.filter((budget) => budget.id !== budgetId),
+    );
+  }
+
+  markAllSynced(): void {
+    const syncedAt = new Date().toISOString();
+    this.persist(
+      this.budgetsSubject.value.map((budget) => ({
+        ...budget,
+        syncStatus: 'synced',
+        synced: true,
+        syncedAt,
+      })),
     );
   }
 
@@ -70,7 +88,9 @@ export class BudgetStorageService {
     }
 
     try {
-      return JSON.parse(raw) as Budget[];
+      return (JSON.parse(raw) as Partial<Budget>[]).map((budget) =>
+        this.normalizeBudget(budget),
+      );
     } catch {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
       return [];
@@ -90,5 +110,18 @@ export class BudgetStorageService {
     }
 
     return `budget-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  private normalizeBudget(raw: Partial<Budget>): Budget {
+    return {
+      id: raw.id ?? this.createId(),
+      categoryId: raw.categoryId ?? 'other',
+      monthKey: raw.monthKey ?? new Date().toISOString().slice(0, 7),
+      limit: typeof raw.limit === 'number' ? raw.limit : 0,
+      syncStatus: raw.synced === true ? 'synced' : raw.syncStatus ?? 'pending',
+      synced: raw.synced ?? raw.syncStatus === 'synced',
+      syncedAt: raw.syncedAt ?? null,
+      updatedAt: raw.updatedAt ?? new Date().toISOString(),
+    };
   }
 }

@@ -94,7 +94,7 @@
           </span>
           <div class="status-row__text">
             <span class="status-row__name">Pending records</span>
-            <span class="status-row__sub">Waiting to be uploaded</span>
+            <span class="status-row__sub">Local changes ready to sync</span>
           </div>
         </div>
 
@@ -150,7 +150,9 @@
   <div class="section">
     <div class="section__heading">
       <p class="section__label">Categories</p>
-      <button class="section__action" (click)="openCreateCategory()">Add</button>
+      <button class="section__action" (click)="openCreateCategory()">
+        Add
+      </button>
     </div>
 
     <div class="card">
@@ -169,7 +171,8 @@
           <div class="category-row__text">
             <span class="category-row__name">{{ category.label }}</span>
             <span class="category-row__sub">
-              {{ category.type }} · {{ category.isSystem ? 'System' : 'Custom' }}
+              {{ category.type }} · {{ category.isSystem ? 'System' : 'Custom'
+              }}
             </span>
           </div>
         </div>
@@ -196,6 +199,37 @@
           />
           <app-badge *ngIf="category.isSystem" variant="success" label="Base" />
         </div>
+
+        <span class="card__divider" *ngIf="!last"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="deletedTransactions.length > 0">
+    <p class="section__label">Recently deleted</p>
+
+    <div class="card">
+      <div
+        class="deleted-row"
+        *ngFor="
+          let transaction of deletedTransactions;
+          trackBy: trackByTransaction;
+          let last = last
+        "
+      >
+        <div class="deleted-row__text">
+          <span class="deleted-row__name">{{ transaction.name }}</span>
+          <span class="deleted-row__sub">
+            {{ transaction.date }} · {{ transaction.type }}
+          </span>
+        </div>
+
+        <button
+          class="deleted-row__restore"
+          (click)="restoreTransaction(transaction.id)"
+        >
+          Restore
+        </button>
 
         <span class="card__divider" *ngIf="!last"></span>
       </div>

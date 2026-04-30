@@ -1,6 +1,8 @@
+import { SyncMeta } from './sync.model';
+
 export type CategoryUsageType = 'expense' | 'income' | 'both';
 
-export interface CategoryDefinition {
+export interface CategoryDefinition extends SyncMeta {
   id: string;
   label: string;
   icon: string;
@@ -18,8 +20,16 @@ export interface SaveCategoryInput {
   type: CategoryUsageType;
 }
 
+const systemSyncMeta: SyncMeta = {
+  syncStatus: 'synced',
+  synced: true,
+  syncedAt: null,
+  updatedAt: 'system',
+};
+
 export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
   housing: {
+    ...systemSyncMeta,
     id: 'housing',
     label: 'Housing',
     icon: '🏠',
@@ -29,6 +39,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   food: {
+    ...systemSyncMeta,
     id: 'food',
     label: 'Food',
     icon: '🛒',
@@ -38,6 +49,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   transport: {
+    ...systemSyncMeta,
     id: 'transport',
     label: 'Transport',
     icon: '🚇',
@@ -47,6 +59,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   entertainment: {
+    ...systemSyncMeta,
     id: 'entertainment',
     label: 'Entertainment',
     icon: '🎬',
@@ -56,6 +69,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   health: {
+    ...systemSyncMeta,
     id: 'health',
     label: 'Health',
     icon: '💊',
@@ -65,6 +79,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   salary: {
+    ...systemSyncMeta,
     id: 'salary',
     label: 'Salary',
     icon: '💰',
@@ -74,6 +89,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   shopping: {
+    ...systemSyncMeta,
     id: 'shopping',
     label: 'Shopping',
     icon: '🛍️',
@@ -83,6 +99,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   utilities: {
+    ...systemSyncMeta,
     id: 'utilities',
     label: 'Utilities',
     icon: '⚡',
@@ -92,6 +109,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   travel: {
+    ...systemSyncMeta,
     id: 'travel',
     label: 'Travel',
     icon: '✈️',
@@ -101,6 +119,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   freelance: {
+    ...systemSyncMeta,
     id: 'freelance',
     label: 'Freelance',
     icon: '💻',
@@ -110,6 +129,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   gift: {
+    ...systemSyncMeta,
     id: 'gift',
     label: 'Gift',
     icon: '🎁',
@@ -119,6 +139,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   refund: {
+    ...systemSyncMeta,
     id: 'refund',
     label: 'Refund',
     icon: '↩️',
@@ -128,6 +149,7 @@ export const BASE_CATEGORY_DEFINITIONS: Record<string, CategoryDefinition> = {
     isSystem: true,
   },
   other: {
+    ...systemSyncMeta,
     id: 'other',
     label: 'Other',
     icon: '📦',

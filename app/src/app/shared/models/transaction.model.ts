@@ -3,9 +3,9 @@ import {
   CategoryDefinition,
   CategoryUsageType,
 } from './category.model';
+import { SyncMeta } from './sync.model';
 
 export type TransactionType = 'expense' | 'income';
-export type SyncStatus = 'synced' | 'pending';
 export type TransactionCategory = string;
 
 export interface TransactionCategoryMeta {
@@ -16,17 +16,13 @@ export interface TransactionCategoryMeta {
   type: CategoryUsageType;
 }
 
-export interface Transaction {
+export interface Transaction extends SyncMeta {
   id: string;
   name: string;
   category: TransactionCategory;
   date: string;
   amount: number;
   type: TransactionType;
-  syncStatus: SyncStatus;
-  synced: boolean;
-  syncedAt: string | null;
-  updatedAt: string;
   deletedAt: string | null;
 }
 

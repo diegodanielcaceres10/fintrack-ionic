@@ -13,15 +13,18 @@ const STORAGE_KEY = 'fintrack.categories.v1';
   providedIn: 'root',
 })
 export class CategoryStorageService {
+  private readonly initialCustomCategories = this.loadCustomCategories();
   private readonly customCategoriesSubject = new BehaviorSubject<
     CategoryDefinition[]
-  >(this.loadCustomCategories());
+  >(this.initialCustomCategories);
 
+  readonly customCategories$ = this.customCategoriesSubject.asObservable();
   readonly categories$ = new BehaviorSubject<CategoryDefinition[]>(
-    this.mergeCategories(this.customCategoriesSubject.value),
+    this.mergeCategories(this.initialCustomCategories),
   );
 
   saveCategory(input: SaveCategoryInput): CategoryDefinition {
+    const now = new Date().toISOString();
     const nowId = `cat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const fallbackId = this.slugify(input.label) || nowId;
     const nextCategory: CategoryDefinition = {
@@ -32,6 +35,10 @@ export class CategoryStorageService {
       bg: this.buildTint(input.color),
       type: input.type,
       isSystem: false,
+      syncStatus: 'pending',
+      synced: false,
+      syncedAt: null,
+      updatedAt: now,
     };
 
     const currentCustom = this.customCategoriesSubject.value;
@@ -62,6 +69,18 @@ export class CategoryStorageService {
     );
   }
 
+  markAllCustomSynced(): void {
+    const syncedAt = new Date().toISOString();
+    this.persist(
+      this.customCategoriesSubject.value.map((category) => ({
+        ...category,
+        syncStatus: 'synced',
+        synced: true,
+        syncedAt,
+      })),
+    );
+  }
+
   getCategoryMap(): Record<string, CategoryDefinition> {
     return this.categories$.value.reduce<Record<string, CategoryDefinition>>(
       (acc, category) => {
@@ -84,7 +103,9 @@ export class CategoryStorageService {
     }
 
     try {
-      return JSON.parse(raw) as CategoryDefinition[];
+      return (JSON.parse(raw) as Partial<CategoryDefinition>[]).map((category) =>
+        this.normalizeCustomCategory(category),
+      );
     } catch {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
       return [];
@@ -121,5 +142,25 @@ export class CategoryStorageService {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  }
+
+  private normalizeCustomCategory(
+    raw: Partial<CategoryDefinition>,
+  ): CategoryDefinition {
+    const color = raw.color ?? '#6B7280';
+
+    return {
+      id: raw.id ?? `cat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      label: raw.label?.trim() || 'Custom category',
+      icon: raw.icon?.trim() || '🏷️',
+      color,
+      bg: raw.bg ?? this.buildTint(color),
+      type: raw.type ?? 'expense',
+      isSystem: false,
+      syncStatus: raw.synced === true ? 'synced' : raw.syncStatus ?? 'pending',
+      synced: raw.synced ?? raw.syncStatus === 'synced',
+      syncedAt: raw.syncedAt ?? null,
+      updatedAt: raw.updatedAt ?? new Date().toISOString(),
+    };
   }
 }
