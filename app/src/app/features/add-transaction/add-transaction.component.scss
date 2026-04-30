@@ -1,25 +1,4 @@
-// ─────────────────────────────────────────────
-// Design tokens
-// ─────────────────────────────────────────────
-
-$color-accent: #4f46e5;
-$color-income: #16a34a;
-$color-surface: #ffffff;
-$color-bg: #f8f9fb;
-$color-border: #eeedf8;
-$color-text-primary: #1a1837;
-$color-text-muted: #9b99b8;
-$color-text-body: #6b6a85;
-
-$radius-sm: 10px;
-$radius-md: 14px;
-$radius-lg: 20px;
-$radius-xl: 28px;
-$radius-full: 9999px;
-
-// ─────────────────────────────────────────────
-// Overlay
-// ─────────────────────────────────────────────
+@use "../../../design-system/variables" as v;
 
 .overlay {
   position: fixed;
@@ -27,21 +6,14 @@ $radius-full: 9999px;
   z-index: 200;
   background: rgba(10, 8, 30, 0.52);
   backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
-
-// ─────────────────────────────────────────────
-// Sheet
-// ─────────────────────────────────────────────
 
 .sheet {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: auto 0 0;
   z-index: 201;
-  background: $color-surface;
-  border-radius: $radius-xl $radius-xl 0 0;
+  background: var(--color-surface);
+  border-radius: 28px 28px 0 0;
   padding: 0 20px calc(24px + env(safe-area-inset-bottom));
   max-height: 92vh;
   overflow-y: auto;
@@ -52,80 +24,70 @@ $radius-full: 9999px;
     display: none;
   }
 
-  // ── Handle area ───────────────────────────────────────────────────────────
-  &__handle-area {
+  &__handle-area,
+  &__header {
     display: flex;
+    align-items: center;
+  }
+
+  &__handle-area {
     justify-content: center;
     padding: 12px 0 4px;
     cursor: grab;
     user-select: none;
+  }
 
-    &:active {
-      cursor: grabbing;
-    }
+  &__header {
+    justify-content: space-between;
+    padding: 10px 0 16px;
   }
 
   &__handle {
     width: 36px;
     height: 4px;
-    border-radius: $radius-full;
+    border-radius: 999px;
     background: #d1d0e8;
   }
 
-  // ── Header ────────────────────────────────────────────────────────────────
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0 16px;
-  }
-
   &__title {
+    margin: 0;
     font-size: 17px;
     font-weight: 600;
-    color: $color-text-primary;
-    margin: 0;
+    color: var(--color-text-primary);
   }
 
   &__close {
     width: 32px;
     height: 32px;
-    border-radius: $radius-sm;
-    border: 1px solid $color-border;
-    background: $color-bg;
+    border-radius: v.$radius-sm;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-body);
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    color: $color-text-body;
     padding: 0;
-    transition: background 0.12s;
-
-    svg {
-      width: 15px;
-      height: 15px;
-    }
   }
 
-  // ── Footer ────────────────────────────────────────────────────────────────
+  &__close svg {
+    width: 15px;
+    height: 15px;
+  }
+
   &__footer {
     padding-top: 20px;
   }
 }
 
-// ─────────────────────────────────────────────
-// Type pills
-// ─────────────────────────────────────────────
-
 .type-pills {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  background: $color-bg;
-  border-radius: $radius-md;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
   padding: 4px;
   margin-bottom: 20px;
-  border: 1px solid $color-border;
 }
 
 .type-pill {
@@ -133,59 +95,48 @@ $radius-full: 9999px;
   border-radius: 10px;
   border: none;
   background: transparent;
-  font-family: inherit;
+  color: var(--color-text-muted);
+  font: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: $color-text-muted;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
 
   &--active {
-    &.type-pill--expense {
-      background: $color-surface;
-      color: $color-accent;
-      border: 1px solid rgba($color-accent, 0.2);
-    }
-    &.type-pill--income {
-      background: $color-surface;
-      color: $color-income;
-      border: 1px solid rgba($color-income, 0.2);
-    }
+    background: var(--color-surface);
+    border: 1px solid var(--color-accent-border);
+  }
+
+  &--active.type-pill--expense {
+    color: var(--color-accent);
+  }
+
+  &--active.type-pill--income {
+    color: var(--color-income);
+    border-color: rgba(22, 163, 74, 0.2);
   }
 }
 
-// ─────────────────────────────────────────────
-// Amount card
-// ─────────────────────────────────────────────
-
 .amount-card {
-  background: rgba($color-accent, 0.05);
-  border: 1px solid rgba($color-accent, 0.14);
-  border-radius: $radius-lg;
+  --accent-color: var(--color-accent);
+  background: var(--color-accent-muted);
+  border: 1px solid var(--color-accent-border);
+  border-radius: v.$radius-lg;
   padding: 20px;
   text-align: center;
   margin-bottom: 24px;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
 
   &--income {
-    background: rgba($color-income, 0.05);
-    border-color: rgba($color-income, 0.14);
+    --accent-color: var(--color-income);
+    background: rgba(22, 163, 74, 0.05);
+    border-color: rgba(22, 163, 74, 0.14);
+  }
 
-    .amount-card__currency {
-      color: $color-income;
-    }
-    .amount-card__input {
-      color: $color-income;
-    }
+  &__hint,
+  .field-group__label {
+    color: var(--color-text-muted);
   }
 
   &__hint {
     font-size: 12px;
-    color: $color-text-muted;
     margin: 0 0 12px;
   }
 
@@ -196,56 +147,48 @@ $radius-full: 9999px;
     gap: 4px;
   }
 
+  &__currency,
+  &__input {
+    color: var(--accent-color);
+  }
+
   &__currency {
     font-size: 28px;
     font-weight: 600;
-    color: $color-accent;
     line-height: 1;
   }
 
   &__input {
-    font-size: 48px;
-    font-weight: 700;
-    color: $color-accent;
+    width: 100%;
+    max-width: 220px;
     border: none;
     background: transparent;
     outline: none;
     text-align: center;
-    width: 100%;
-    max-width: 220px;
-    font-family: inherit;
-    line-height: 1;
-    caret-color: $color-accent;
+    font: 700 48px/1 inherit;
+    caret-color: var(--accent-color);
 
-    // Remove spinner arrows
+    &::placeholder {
+      color: color-mix(in srgb, var(--accent-color) 30%, transparent);
+    }
+
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
     }
-    &[type="number"] {
-      -moz-appearance: textfield;
-    }
-
-    &::placeholder {
-      color: rgba($color-accent, 0.3);
-    }
   }
 }
-
-// ─────────────────────────────────────────────
-// Field group
-// ─────────────────────────────────────────────
 
 .field-group {
   margin-bottom: 18px;
 
   &__label {
+    margin: 0 0 8px 2px;
     font-size: 12px;
     font-weight: 600;
-    color: $color-text-muted;
+    color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin: 0 0 8px 2px;
   }
 
   &__optional {
@@ -256,19 +199,13 @@ $radius-full: 9999px;
   }
 }
 
-// ─────────────────────────────────────────────
-// Category strip
-// ─────────────────────────────────────────────
-
 .category-strip {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 2px; // room for border when active
   margin: 0 -20px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 0 20px 2px;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;
@@ -280,25 +217,21 @@ $radius-full: 9999px;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  min-width: 64px;
   flex-shrink: 0;
   padding: 10px 12px 8px;
-  border-radius: $radius-md;
-  border: 1px solid $color-border;
-  background: $color-surface;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s;
-  min-width: 64px;
+  border-radius: v.$radius-md;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
 
   &--active {
-    border-color: $color-accent;
-    background: rgba($color-accent, 0.05);
+    border-color: var(--color-accent);
+    background: var(--color-accent-muted);
+  }
 
-    .cat-pill__label {
-      color: $color-accent;
-      font-weight: 600;
-    }
+  &--active .cat-pill__label {
+    color: var(--color-accent);
+    font-weight: 600;
   }
 
   &__icon {
@@ -309,103 +242,71 @@ $radius-full: 9999px;
   &__label {
     font-size: 10px;
     font-weight: 500;
-    color: $color-text-body;
+    color: var(--color-text-body);
     white-space: nowrap;
   }
 }
-
-// ─────────────────────────────────────────────
-// Generic input row
-// ─────────────────────────────────────────────
 
 .input-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: $color-surface;
-  border: 1px solid $color-border;
-  border-radius: $radius-md;
-  padding: 0 14px;
   height: 46px;
-  transition: border-color 0.15s;
+  padding: 0 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: v.$radius-md;
 
   &:focus-within {
-    border-color: $color-accent;
+    border-color: var(--color-accent);
   }
 
   &__icon {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: $color-text-muted;
+    color: var(--color-text-muted);
   }
 
   &__field {
     flex: 1;
+    min-width: 0;
     border: none;
     background: transparent;
-    font-family: inherit;
-    font-size: 14px;
-    color: $color-text-primary;
     outline: none;
-    min-width: 0;
+    font: inherit;
+    font-size: 14px;
+    color: var(--color-text-primary);
 
     &::placeholder {
-      color: $color-text-muted;
-    }
-
-    // Date input styling
-    &--date {
-      color-scheme: light;
-      cursor: pointer;
-
-      &::-webkit-calendar-picker-indicator {
-        opacity: 0.4;
-        cursor: pointer;
-      }
+      color: var(--color-text-muted);
     }
   }
 }
 
-// ─────────────────────────────────────────────
-// CTA button
-// ─────────────────────────────────────────────
-
 .cta-btn {
   width: 100%;
   height: 52px;
-  border-radius: $radius-md;
+  border-radius: v.$radius-md;
   border: none;
-  background: $color-accent;
-  color: #ffffff;
-  font-family: inherit;
+  background: var(--color-accent);
+  color: #fff;
+  font: inherit;
   font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  transition:
-    opacity 0.15s,
-    background 0.2s;
 
   &--income {
-    background: $color-income;
+    background: var(--color-income);
   }
 
   &--disabled {
-    background: $color-bg;
-    color: $color-text-muted;
-    border: 1px solid $color-border;
-    cursor: default;
-  }
-
-  &:not(.cta-btn--disabled):hover {
-    opacity: 0.92;
-  }
-  &:not(.cta-btn--disabled):active {
-    opacity: 0.84;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
   }
 
   &__amount {

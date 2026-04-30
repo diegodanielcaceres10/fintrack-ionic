@@ -1,27 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// settings.page.scss
-// Only page-specific styles. Shell, nav, .card, .icon-wrap, .badge,
-// .btn-primary and .section__label come from the design system.
-// ─────────────────────────────────────────────────────────────────────────────
-
 @use "../../../design-system/variables" as v;
-
-// ─── Section wrapper ──────────────────────────────────────────────────────────
-// .section and .section__label are defined in _components.scss globally.
-// Only add page-specific overrides here if needed.
-
-.section {
-  padding: v.$space-10 v.$page-padding-x 0;
-
-  &__label {
-    font-size: v.$font-size-sm;
-    font-weight: v.$font-weight-semibold;
-    text-transform: uppercase;
-    letter-spacing: v.$letter-spacing-wider;
-    color: var(--color-text-muted);
-    margin: 0 0 v.$space-4 4px;
-  }
-}
 
 .section__heading {
   display: flex;
@@ -38,30 +15,19 @@
   padding: 0 4px v.$space-4;
 }
 
-// ─── Card ─────────────────────────────────────────────────────────────────────
-// .card and .card__divider are defined in _components.scss globally.
-// Extend only with page-specific overrides.
-
-.card {
-  background: var(--color-surface);
-  border-radius: v.$radius-lg;
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-
-  &__divider {
-    height: 1px;
-    background: var(--color-border);
-    margin: 0 v.$space-8;
-  }
-}
-
-// ─── Radio rows ───────────────────────────────────────────────────────────────
-
-.radio-row {
+.radio-row,
+.status-row,
+.account-row,
+.logout-row,
+.category-row {
   display: flex;
   align-items: center;
   gap: v.$space-6;
   padding: v.$space-7 v.$space-8;
+}
+
+.radio-row,
+.logout-row {
   cursor: pointer;
   position: relative;
   transition: background v.$transition-fast;
@@ -69,6 +35,9 @@
   &:hover {
     background: var(--color-bg);
   }
+}
+
+.radio-row {
   &--selected {
     background: rgba(79, 70, 229, 0.035);
   }
@@ -118,211 +87,118 @@
   }
 }
 
-.radio-row--selected {
-  .radio-circle {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
-
-    &__dot {
-      background: var(--color-text-inverse);
-    }
-  }
+.radio-row--selected .radio-circle {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
 }
 
-.radio-text {
+.radio-row--selected .radio-circle__dot {
+  background: var(--color-text-inverse);
+}
+
+.radio-text,
+.status-row__text,
+.account-row__text,
+.category-row__text {
   display: flex;
   flex-direction: column;
   gap: v.$space-1;
-
-  &__label {
-    font-size: v.$font-size-md;
-    font-weight: v.$font-weight-medium;
-    color: var(--color-text-primary);
-  }
-
-  &__sub {
-    font-size: v.$font-size-sm;
-    color: var(--color-text-muted);
-  }
 }
 
-// ─── Status rows ──────────────────────────────────────────────────────────────
+.radio-text__label,
+.status-row__name,
+.account-row__email,
+.category-row__name {
+  font-size: v.$font-size-base;
+  font-weight: v.$font-weight-medium;
+  color: var(--color-text-primary);
+}
 
-.status-row {
+.radio-text__sub,
+.status-row__sub,
+.account-row__label,
+.category-row__sub,
+.app-version {
+  font-size: v.$font-size-sm;
+  color: var(--color-text-muted);
+}
+
+.status-row,
+.category-row {
+  justify-content: space-between;
+}
+
+.status-row__left,
+.category-row__left {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: v.$space-7 v.$space-8;
-
-  &__left {
-    display: flex;
-    align-items: center;
-    gap: v.$space-6;
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: v.$space-1;
-  }
-
-  &__name {
-    font-size: v.$font-size-md;
-    font-weight: v.$font-weight-medium;
-    color: var(--color-text-primary);
-  }
-
-  &__sub {
-    font-size: v.$font-size-sm;
-    color: var(--color-text-muted);
-  }
+  gap: v.$space-6;
+  min-width: 0;
 }
-
-// ─── Sync button wrapper ──────────────────────────────────────────────────────
-// .btn-primary comes from the design system — only wrap padding is local.
 
 .sync-btn-wrap {
   padding: v.$space-7 v.$space-8;
 }
 
-.sync-check {
+.sync-check,
+.logout-row__chevron {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
 
-// ─── Account rows ─────────────────────────────────────────────────────────────
-
-.account-row {
+.category-row__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: v.$radius-sm;
   display: flex;
   align-items: center;
-  gap: v.$space-6;
-  padding: v.$space-7 v.$space-8;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
 
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: v.$space-1;
-  }
+.category-row__sub {
+  text-transform: capitalize;
+}
 
-  &__label {
-    font-size: v.$font-size-sm;
-    color: var(--color-text-muted);
-    font-weight: v.$font-weight-medium;
-  }
+.category-row__actions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
+  flex-shrink: 0;
+}
 
-  &__email {
-    font-size: v.$font-size-base;
-    font-weight: v.$font-weight-medium;
-    color: var(--color-text-primary);
+.category-row__btn {
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: v.$font-weight-semibold;
+  padding: 0;
+
+  &--danger {
+    color: var(--color-danger);
   }
 }
 
 .logout-row {
-  display: flex;
-  align-items: center;
-  gap: v.$space-6;
-  padding: v.$space-7 v.$space-8;
   width: 100%;
   background: none;
   border: none;
-  cursor: pointer;
-  font-family: inherit;
   text-align: left;
-  transition: background v.$transition-fast;
-
-  &:hover {
-    background: var(--color-bg);
-  }
-
-  &__label {
-    flex: 1;
-    font-size: v.$font-size-md;
-    font-weight: v.$font-weight-medium;
-    color: var(--color-danger);
-  }
-
-  &__chevron {
-    width: 16px;
-    height: 16px;
-    color: var(--color-text-muted);
-    flex-shrink: 0;
-  }
 }
 
-.category-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: v.$space-6;
-  padding: v.$space-7 v.$space-8;
-
-  &__left {
-    display: flex;
-    align-items: center;
-    gap: v.$space-5;
-    min-width: 0;
-  }
-
-  &__icon {
-    width: 36px;
-    height: 36px;
-    border-radius: v.$radius-sm;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: v.$space-1;
-    min-width: 0;
-  }
-
-  &__name {
-    font-size: v.$font-size-base;
-    font-weight: v.$font-weight-medium;
-    color: var(--color-text-primary);
-  }
-
-  &__sub {
-    font-size: v.$font-size-sm;
-    color: var(--color-text-muted);
-    text-transform: capitalize;
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: v.$space-3;
-    flex-shrink: 0;
-  }
-
-  &__btn {
-    border: none;
-    background: transparent;
-    color: var(--color-accent);
-    font: inherit;
-    font-size: v.$font-size-sm;
-    font-weight: v.$font-weight-semibold;
-    padding: 0;
-
-    &--danger {
-      color: var(--color-danger);
-    }
-  }
+.logout-row__label {
+  flex: 1;
+  font-size: v.$font-size-md;
+  font-weight: v.$font-weight-medium;
+  color: var(--color-danger);
 }
-
-// ─── App version ──────────────────────────────────────────────────────────────
 
 .app-version {
   text-align: center;
-  font-size: v.$font-size-sm;
-  color: var(--color-text-muted);
   padding: v.$space-12 0 0;
   margin: 0;
 }
