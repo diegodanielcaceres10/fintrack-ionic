@@ -6,6 +6,7 @@ import {
   CategoryDefinition,
   SaveCategoryInput,
 } from '../models/category.model';
+import { PersistentStoreService } from './persistent-store.service';
 
 const STORAGE_KEY = 'fintrack.categories.v1';
 
@@ -13,15 +14,20 @@ const STORAGE_KEY = 'fintrack.categories.v1';
   providedIn: 'root',
 })
 export class CategoryStorageService {
-  private readonly initialCustomCategories = this.loadCustomCategories();
   private readonly customCategoriesSubject = new BehaviorSubject<
     CategoryDefinition[]
-  >(this.initialCustomCategories);
+  >([]);
 
   readonly customCategories$ = this.customCategoriesSubject.asObservable();
   readonly categories$ = new BehaviorSubject<CategoryDefinition[]>(
-    this.mergeCategories(this.initialCustomCategories),
+    Object.values(BASE_CATEGORY_DEFINITIONS),
   );
+
+  constructor(private readonly persistentStore: PersistentStoreService) {
+    const initialCustomCategories = this.loadCustomCategories();
+    this.customCategoriesSubject.next(initialCustomCategories);
+    this.categories$.next(this.mergeCategories(initialCustomCategories));
+  }
 
   saveCategory(input: SaveCategoryInput): CategoryDefinition {
     const now = new Date().toISOString();
@@ -92,33 +98,15 @@ export class CategoryStorageService {
   }
 
   private loadCustomCategories(): CategoryDefinition[] {
-    if (typeof localStorage === 'undefined') {
-      return [];
-    }
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      return [];
-    }
-
-    try {
-      return (JSON.parse(raw) as Partial<CategoryDefinition>[]).map((category) =>
-        this.normalizeCustomCategory(category),
-      );
-    } catch {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      return [];
-    }
+    return this.persistentStore
+      .getJsonSync<Partial<CategoryDefinition>[]>(STORAGE_KEY, [])
+      .map((category) => this.normalizeCustomCategory(category));
   }
 
   private persist(customCategories: CategoryDefinition[]): void {
     this.customCategoriesSubject.next(customCategories);
     this.categories$.next(this.mergeCategories(customCategories));
-
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(customCategories));
-    }
+    void this.persistentStore.setJson(STORAGE_KEY, customCategories);
   }
 
   private mergeCategories(

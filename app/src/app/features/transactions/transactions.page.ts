@@ -10,6 +10,8 @@ import { ListRowComponent } from '../../shared/components/list-row/list-row.comp
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { AddTransactionComponent } from '../add-transaction/add-transaction.component';
+import { CategoryRepository } from '../../shared/repositories/category.repository';
+import { TransactionRepository } from '../../shared/repositories/transaction.repository';
 import { GroupTotalPipe, PositiveTotalPipe } from './transaction.pipes';
 import { SyncStatus } from '../../shared/models/sync.model';
 import {
@@ -17,8 +19,6 @@ import {
   Transaction,
   TransactionCategoryMeta,
 } from '../../shared/models/transaction.model';
-import { CategoryStorageService } from '../../shared/services/category-storage.service';
-import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 export type FilterPill = 'all' | 'expenses' | 'income';
 
@@ -57,10 +57,10 @@ export class TransactionsPage implements OnInit, OnDestroy {
   private allTransactions: Transaction[] = [];
 
   constructor(
-    private readonly transactionStorage: TransactionStorageService,
-    private readonly categoryStorage: CategoryStorageService,
+    private readonly transactionRepository: TransactionRepository,
+    private readonly categoryRepository: CategoryRepository,
   ) {
-    this.categoryMeta = this.categoryStorage.getCategoryMap();
+    this.categoryMeta = this.categoryRepository.getCategoryMap();
   }
 
   searchQuery = '';
@@ -212,7 +212,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.transactionStorage.updateTransaction(this.editingTransaction.id, payload);
+    this.transactionRepository.update(this.editingTransaction.id, payload);
     this.closeEditSheet();
   }
 
@@ -251,7 +251,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.transactionStorage.softDeleteTransaction(this.pendingDeleteTransaction.id);
+    this.transactionRepository.softDelete(this.pendingDeleteTransaction.id);
     this.pendingDeleteTransaction = null;
   }
 
@@ -282,7 +282,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+    this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categoryMeta = categories.reduce<Record<string, TransactionCategoryMeta>>(
           (acc, category) => {
@@ -294,7 +294,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
       },
     );
 
-    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+    this.transactionsSubscription = this.transactionRepository.transactions$.subscribe(
       (transactions) => {
         this.allTransactions = transactions;
       },

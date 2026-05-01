@@ -18,7 +18,7 @@ import {
 import { AddTransactionComponent } from '../../../features/add-transaction/add-transaction.component';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { CreateTransactionInput } from '../../models/transaction.model';
-import { TransactionStorageService } from '../../services/transaction-storage.service';
+import { TransactionRepository } from '../../repositories/transaction.repository';
 
 export interface ShellAction {
   label: string;
@@ -44,7 +44,7 @@ export interface ShellAction {
 })
 export class AppShellComponent {
   constructor(
-    private readonly transactionStorage: TransactionStorageService,
+    private readonly transactionRepository: TransactionRepository,
   ) {}
 
   @Input() title = '';
@@ -71,7 +71,7 @@ export class AppShellComponent {
   }
 
   onTransactionSaved(payload: CreateTransactionInput): void {
-    this.transactionStorage.addTransaction(payload);
+    this.transactionRepository.add(payload);
     this.closeAddSheet();
   }
 

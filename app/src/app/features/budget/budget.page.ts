@@ -5,15 +5,15 @@ import { IonActionSheet, IonAlert } from '@ionic/angular/standalone';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { BudgetRepository } from '../../shared/repositories/budget.repository';
+import { CategoryRepository } from '../../shared/repositories/category.repository';
+import { TransactionRepository } from '../../shared/repositories/transaction.repository';
 import { Budget } from '../../shared/models/budget.model';
 import { CategoryDefinition } from '../../shared/models/category.model';
 import {
   Transaction,
   TransactionCategory,
 } from '../../shared/models/transaction.model';
-import { BudgetStorageService } from '../../shared/services/budget-storage.service';
-import { CategoryStorageService } from '../../shared/services/category-storage.service';
-import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 interface BudgetView {
   id: string;
@@ -134,11 +134,11 @@ export class BudgetPage implements OnInit, OnDestroy {
   }
 
   constructor(
-    private readonly budgetStorage: BudgetStorageService,
-    private readonly transactionStorage: TransactionStorageService,
-    private readonly categoryStorage: CategoryStorageService,
+    private readonly budgetRepository: BudgetRepository,
+    private readonly transactionRepository: TransactionRepository,
+    private readonly categoryRepository: CategoryRepository,
   ) {
-    this.categoryMeta = this.categoryStorage.getCategoryMap();
+    this.categoryMeta = this.categoryRepository.getCategoryMap();
     this.categories = Object.values(this.categoryMeta);
   }
 
@@ -247,7 +247,7 @@ export class BudgetPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+    this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categories = categories;
         this.categoryMeta = categories.reduce<Record<string, CategoryDefinition>>(
@@ -261,12 +261,12 @@ export class BudgetPage implements OnInit, OnDestroy {
       },
     );
 
-    this.budgetsSubscription = this.budgetStorage.budgets$.subscribe((budgets) => {
+    this.budgetsSubscription = this.budgetRepository.budgets$.subscribe((budgets) => {
       this.budgets = budgets;
       this.rebuildBudgetItems();
     });
 
-    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+    this.transactionsSubscription = this.transactionRepository.transactions$.subscribe(
       (transactions) => {
         this.transactions = transactions;
         this.rebuildBudgetItems();
@@ -313,7 +313,7 @@ export class BudgetPage implements OnInit, OnDestroy {
       return false;
     }
 
-    this.budgetStorage.saveBudget({
+    this.budgetRepository.save({
       categoryId: this.budgetFormCategoryId,
       monthKey: this.monthKey(this.currentDate),
       limit: parsedLimit,
@@ -327,7 +327,7 @@ export class BudgetPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.budgetStorage.deleteBudget(this.pendingDeleteBudget.id);
+    this.budgetRepository.delete(this.pendingDeleteBudget.id);
     this.pendingDeleteBudget = null;
   }
 

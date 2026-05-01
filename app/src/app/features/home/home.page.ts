@@ -12,12 +12,12 @@ import { Subscription } from 'rxjs';
 
 import { AppShellComponent } from '../../shared/components/app-shell/app-shell.component';
 import { ListRowComponent } from '../../shared/components/list-row/list-row.component';
+import { CategoryRepository } from '../../shared/repositories/category.repository';
+import { TransactionRepository } from '../../shared/repositories/transaction.repository';
 import {
   Transaction,
   TransactionCategoryMeta,
 } from '../../shared/models/transaction.model';
-import { CategoryStorageService } from '../../shared/services/category-storage.service';
-import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
 
 Chart.register(DoughnutController, ArcElement, Tooltip);
 
@@ -48,10 +48,10 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   private allTransactions: Transaction[] = [];
 
   constructor(
-    private readonly transactionStorage: TransactionStorageService,
-    private readonly categoryStorage: CategoryStorageService,
+    private readonly transactionRepository: TransactionRepository,
+    private readonly categoryRepository: CategoryRepository,
   ) {
-    this.categoryMeta = this.categoryStorage.getCategoryMap();
+    this.categoryMeta = this.categoryRepository.getCategoryMap();
   }
 
   balance = 0;
@@ -62,7 +62,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   transactions: Transaction[] = [];
 
   ngOnInit(): void {
-    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+    this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categoryMeta = categories.reduce<Record<string, TransactionCategoryMeta>>(
           (acc, category) => {
@@ -80,7 +80,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       },
     );
 
-    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+    this.transactionsSubscription = this.transactionRepository.transactions$.subscribe(
       (transactions) => {
         this.allTransactions = transactions;
         this.transactions = [...transactions]

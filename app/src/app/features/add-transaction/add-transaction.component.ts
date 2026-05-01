@@ -23,7 +23,7 @@ import {
   TransactionType,
 } from '../../shared/models/transaction.model';
 import { CategoryDefinition } from '../../shared/models/category.model';
-import { CategoryStorageService } from '../../shared/services/category-storage.service';
+import { CategoryRepository } from '../../shared/repositories/category.repository';
 
 interface CategoryOption {
   id: TransactionCategory;
@@ -82,7 +82,7 @@ export class AddTransactionComponent implements OnInit, OnChanges, OnDestroy {
   private categoryDefinitions: CategoryDefinition[] = [];
   private pendingInitialTransaction: Transaction | null = null;
 
-  constructor(private readonly categoryStorage: CategoryStorageService) {}
+  constructor(private readonly categoryRepository: CategoryRepository) {}
 
   get amountValue(): number {
     return parseFloat(this.amountRaw) || 0;
@@ -181,7 +181,7 @@ export class AddTransactionComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+    this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categoryDefinitions = categories;
         this.applyPendingState();

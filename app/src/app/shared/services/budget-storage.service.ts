@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { Budget, SaveBudgetInput } from '../models/budget.model';
+import { PersistentStoreService } from './persistent-store.service';
 
 const STORAGE_KEY = 'fintrack.budgets.v1';
 
@@ -9,12 +10,13 @@ const STORAGE_KEY = 'fintrack.budgets.v1';
   providedIn: 'root',
 })
 export class BudgetStorageService {
-  private readonly initialBudgets = this.loadBudgets();
-  private readonly budgetsSubject = new BehaviorSubject<Budget[]>(
-    this.initialBudgets,
-  );
+  private readonly budgetsSubject = new BehaviorSubject<Budget[]>([]);
 
   readonly budgets$ = this.budgetsSubject.asObservable();
+
+  constructor(private readonly persistentStore: PersistentStoreService) {
+    this.budgetsSubject.next(this.loadBudgets());
+  }
 
   saveBudget(input: SaveBudgetInput): Budget {
     const now = new Date().toISOString();
@@ -77,31 +79,14 @@ export class BudgetStorageService {
   }
 
   private loadBudgets(): Budget[] {
-    if (typeof localStorage === 'undefined') {
-      return [];
-    }
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      return [];
-    }
-
-    try {
-      return (JSON.parse(raw) as Partial<Budget>[]).map((budget) =>
-        this.normalizeBudget(budget),
-      );
-    } catch {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-      return [];
-    }
+    return this.persistentStore
+      .getJsonSync<Partial<Budget>[]>(STORAGE_KEY, [])
+      .map((budget) => this.normalizeBudget(budget));
   }
 
   private persist(budgets: Budget[]): void {
     this.budgetsSubject.next(budgets);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(budgets));
-    }
+    void this.persistentStore.setJson(STORAGE_KEY, budgets);
   }
 
   private createId(): string {

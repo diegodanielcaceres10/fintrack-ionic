@@ -12,9 +12,9 @@ import {
   SaveCategoryInput,
 } from '../../shared/models/category.model';
 import { Transaction } from '../../shared/models/transaction.model';
-import { BudgetStorageService } from '../../shared/services/budget-storage.service';
-import { CategoryStorageService } from '../../shared/services/category-storage.service';
-import { TransactionStorageService } from '../../shared/services/transaction-storage.service';
+import { BudgetRepository } from '../../shared/repositories/budget.repository';
+import { CategoryRepository } from '../../shared/repositories/category.repository';
+import { TransactionRepository } from '../../shared/repositories/transaction.repository';
 
 export type SyncMode = 'manual' | 'daily' | 'automatic';
 export type SyncState = 'idle' | 'syncing' | 'success' | 'error';
@@ -98,9 +98,9 @@ export class SettingsPage implements OnInit, OnDestroy {
   ];
 
   constructor(
-    private readonly categoryStorage: CategoryStorageService,
-    private readonly transactionStorage: TransactionStorageService,
-    private readonly budgetStorage: BudgetStorageService,
+    private readonly categoryRepository: CategoryRepository,
+    private readonly transactionRepository: TransactionRepository,
+    private readonly budgetRepository: BudgetRepository,
   ) {}
 
   get lastSyncLabel(): string {
@@ -161,9 +161,9 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.syncState = 'syncing';
 
     setTimeout(() => {
-      this.transactionStorage.markAllSynced();
-      this.budgetStorage.markAllSynced();
-      this.categoryStorage.markAllCustomSynced();
+      this.transactionRepository.markAllSynced();
+      this.budgetRepository.markAllSynced();
+      this.categoryRepository.markAllCustomSynced();
       this.syncState = 'success';
 
       setTimeout(() => {
@@ -205,7 +205,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   saveCategory(input: SaveCategoryInput): void {
-    this.categoryStorage.saveCategory(input);
+    this.categoryRepository.save(input);
     this.closeCategorySheet();
   }
 
@@ -242,7 +242,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.categoriesSubscription = this.categoryStorage.categories$.subscribe(
+    this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categories = [...categories].sort((a, b) => {
           if (a.isSystem !== b.isSystem) {
@@ -255,12 +255,12 @@ export class SettingsPage implements OnInit, OnDestroy {
     );
 
     this.customCategoriesSubscription =
-      this.categoryStorage.customCategories$.subscribe((categories) => {
+      this.categoryRepository.customCategories$.subscribe((categories) => {
         this.customCategories = categories;
         this.refreshSyncStatus();
       });
 
-    this.transactionsSubscription = this.transactionStorage.transactions$.subscribe(
+    this.transactionsSubscription = this.transactionRepository.transactions$.subscribe(
       (transactions) => {
         this.transactions = transactions;
         this.transactionCategoryIds = transactions.map(
@@ -271,7 +271,7 @@ export class SettingsPage implements OnInit, OnDestroy {
       },
     );
 
-    this.budgetsSubscription = this.budgetStorage.budgets$.subscribe((budgets) => {
+    this.budgetsSubscription = this.budgetRepository.budgets$.subscribe((budgets) => {
       this.budgets = budgets;
       this.budgetCategoryIds = budgets.map((budget) => budget.categoryId);
       this.syncUsedCategoryIds();
@@ -279,7 +279,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     });
 
     this.deletedTransactionsSubscription =
-      this.transactionStorage.deletedTransactions$.subscribe((transactions) => {
+      this.transactionRepository.deletedTransactions$.subscribe((transactions) => {
         this.deletedTransactions = transactions;
         this.refreshSyncStatus();
       });
@@ -294,7 +294,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   restoreTransaction(transactionId: string): void {
-    this.transactionStorage.restoreTransaction(transactionId);
+    this.transactionRepository.restore(transactionId);
   }
 
   private confirmDeleteCategory(): void {
@@ -302,7 +302,7 @@ export class SettingsPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.categoryStorage.deleteCategory(this.deletingCategory.id);
+    this.categoryRepository.delete(this.deletingCategory.id);
     this.deletingCategory = null;
   }
 
