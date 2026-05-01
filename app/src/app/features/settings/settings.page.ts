@@ -15,9 +15,8 @@ import { Transaction } from '../../shared/models/transaction.model';
 import { BudgetRepository } from '../../shared/repositories/budget.repository';
 import { CategoryRepository } from '../../shared/repositories/category.repository';
 import { TransactionRepository } from '../../shared/repositories/transaction.repository';
-
-export type SyncMode = 'manual' | 'daily' | 'automatic';
-export type SyncState = 'idle' | 'syncing' | 'success' | 'error';
+import { SyncMode, SyncState, SyncSummary } from '../../shared/models/sync.model';
+import { SyncService } from '../../shared/services/sync.service';
 
 interface SyncOption {
   value: SyncMode;
@@ -47,6 +46,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   private transactionsSubscription?: Subscription;
   private budgetsSubscription?: Subscription;
   private deletedTransactionsSubscription?: Subscription;
+  private syncSummarySubscription?: Subscription;
   private transactionCategoryIds: string[] = [];
   private budgetCategoryIds: string[] = [];
   private usedCategoryIds = new Set<string>();
@@ -54,7 +54,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   private transactions: Transaction[] = [];
   private budgets: Budget[] = [];
 
-  selectedSyncMode: SyncMode = 'daily';
+  selectedSyncMode: SyncMode;
 
   readonly syncOptions: SyncOption[] = [
     {
@@ -101,7 +101,10 @@ export class SettingsPage implements OnInit, OnDestroy {
     private readonly categoryRepository: CategoryRepository,
     private readonly transactionRepository: TransactionRepository,
     private readonly budgetRepository: BudgetRepository,
-  ) {}
+    private readonly syncService: SyncService,
+  ) {
+    this.selectedSyncMode = this.syncService.getCurrentSyncMode();
+  }
 
   get lastSyncLabel(): string {
     if (!this.lastSyncedAt) {
@@ -151,25 +154,11 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   setSyncMode(mode: SyncMode): void {
     this.selectedSyncMode = mode;
+    this.syncService.setSyncMode(mode);
   }
 
-  syncNow(): void {
-    if (this.syncState === 'syncing') {
-      return;
-    }
-
-    this.syncState = 'syncing';
-
-    setTimeout(() => {
-      this.transactionRepository.markAllSynced();
-      this.budgetRepository.markAllSynced();
-      this.categoryRepository.markAllCustomSynced();
-      this.syncState = 'success';
-
-      setTimeout(() => {
-        this.syncState = 'idle';
-      }, 2500);
-    }, 600);
+  async syncNow(): Promise<void> {
+    await this.syncService.syncNow();
   }
 
   logout(): void {
@@ -242,6 +231,10 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.syncSummarySubscription = this.syncService.summary$.subscribe(
+      (summary) => this.applySyncSummary(summary),
+    );
+
     this.categoriesSubscription = this.categoryRepository.categories$.subscribe(
       (categories) => {
         this.categories = [...categories].sort((a, b) => {
@@ -257,7 +250,6 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.customCategoriesSubscription =
       this.categoryRepository.customCategories$.subscribe((categories) => {
         this.customCategories = categories;
-        this.refreshSyncStatus();
       });
 
     this.transactionsSubscription = this.transactionRepository.transactions$.subscribe(
@@ -267,7 +259,6 @@ export class SettingsPage implements OnInit, OnDestroy {
           (transaction) => transaction.category,
         );
         this.syncUsedCategoryIds();
-        this.refreshSyncStatus();
       },
     );
 
@@ -275,17 +266,16 @@ export class SettingsPage implements OnInit, OnDestroy {
       this.budgets = budgets;
       this.budgetCategoryIds = budgets.map((budget) => budget.categoryId);
       this.syncUsedCategoryIds();
-      this.refreshSyncStatus();
     });
 
     this.deletedTransactionsSubscription =
       this.transactionRepository.deletedTransactions$.subscribe((transactions) => {
         this.deletedTransactions = transactions;
-        this.refreshSyncStatus();
       });
   }
 
   ngOnDestroy(): void {
+    this.syncSummarySubscription?.unsubscribe();
     this.categoriesSubscription?.unsubscribe();
     this.customCategoriesSubscription?.unsubscribe();
     this.transactionsSubscription?.unsubscribe();
@@ -313,23 +303,10 @@ export class SettingsPage implements OnInit, OnDestroy {
     ]);
   }
 
-  private refreshSyncStatus(): void {
-    const allTransactions = [...this.transactions, ...this.deletedTransactions];
-    const syncedAtValues = [
-      ...allTransactions.map((transaction) => transaction.syncedAt),
-      ...this.budgets.map((budget) => budget.syncedAt),
-      ...this.customCategories.map((category) => category.syncedAt),
-    ].filter((value): value is string => !!value);
-
-    this.pendingRecords =
-      allTransactions.filter((transaction) => transaction.syncStatus === 'pending')
-        .length +
-      this.budgets.filter((budget) => budget.syncStatus === 'pending').length +
-      this.customCategories.filter((category) => category.syncStatus === 'pending')
-        .length;
-
-    this.lastSyncedAt = syncedAtValues.length
-      ? new Date(syncedAtValues.sort()[syncedAtValues.length - 1])
-      : null;
+  private applySyncSummary(summary: SyncSummary): void {
+    this.pendingRecords = summary.pendingRecords;
+    this.lastSyncedAt = summary.lastSyncedAt;
+    this.syncState = summary.syncState;
+    this.selectedSyncMode = summary.syncMode;
   }
 }
